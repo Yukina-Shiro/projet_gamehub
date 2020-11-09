@@ -4,11 +4,10 @@
  * @version : 1.0
  */
 
-require_once __DIR__ . '/../models/OrderModel.php';
-require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/../views/View.php';
 
 // Load local database
-require_once __DIR__ . '../data/Cars.php';
+require_once __DIR__ . '/../data/Cars.php';
 
 class OrderController extends Controller {
 	
@@ -49,20 +48,20 @@ class OrderController extends Controller {
 		if ( isset( Cars::$brends[$this->model->getBrend()][$this->model->getModel()])) {
 			$this->model_price = Cars::$brends[$this->model->getBrend()][$this->model->getModel()];
 		}
-		// Set model price
-		$this->model->setTotalPrice( $this->model_price);
+		// Set total price to  model price
+		$total_price = $this->model_price;
 		
 		// Selected gearbox (Radio button)
 		$this->model->setGearbox( filter_input( $method, 'gearbox', FILTER_SANITIZE_STRING));
 		if ( ! is_null( $this->model->getGearbox())) {
 			$this->gearbox_price = Cars::$gearboxes[$this->model->getGearbox()]['price'];
 		}
-		// Add gearbox price
+		// Add gearbox price to total price
 		$total_price += $this->gearbox_price;
 		
 		// Checked gearbox
 		foreach ( Cars::$gearboxes as $key => $value) {
-			if ( $key != $this->gearbox)
+			if ( $key != $this->model->getGearbox())
 				$this->checked_gearboxes[$key] = '';
 			else
 				$this->checked_gearboxes[$key] = 'checked';
@@ -104,9 +103,8 @@ class OrderController extends Controller {
 		// Set model price
 		$this->model->setTotalPrice( $total_price);
 		
-		// Get all data
-		$data = $this->model->getProperties();
-		$data = array_merge( $data, $this->getProperties());
+		// Get all the view properties
+		$data = $this->getProperties();
 		
 		// View instance
 		$view = View::factory( self::$name, __FUNCTION__, $data);
@@ -115,10 +113,16 @@ class OrderController extends Controller {
 		$view->display();
 	}
 	
-	// Save order
-	public function save() {
+	// Get all the view properties
+	public function getProperties() {
+		// View properties
+		$properties = get_object_vars( $this);
+		// Unset the DAO and the Model object
+		unset( $properties['dao'], $properties['model']);
+		// Merge with Model properties
+		return array_merge( $properties, $this->model->getProperties());
 	}
-
+	
 }
 
 ?>

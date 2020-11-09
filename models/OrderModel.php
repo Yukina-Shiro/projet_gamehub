@@ -4,7 +4,7 @@
  * @version : 1.0
  */
 
-require_once __DIR__ . "Model.php";
+require_once __DIR__ . '/Model.php';
 
 // Order model
 class OrderModel extends Model {
@@ -14,23 +14,23 @@ class OrderModel extends Model {
 	public $table = 'orders';
 	
 	// Forms fields
-	private $lastname = null;
-	private $firstname = null;
-	private $email = null;
+	protected $lastname = null;
+	protected $firstname = null;
+	protected $email = null;
 	
-	private $brend = null;
-	private $model = null;
-	private $gearbox = null;
-	private $color = null;
+	protected $brend = null;
+	protected $model = null;
+	protected $gearbox = null;
+	protected $color = null;
 	// JSON of an array()
-	private $options = null;
+	protected $options = null;
 
-	private $return_price = null;
+	protected $return_price = null;
 	
-	private $total_price = null;
+	protected $total_price = null;
 	
 	// @Column( default='now()')
-	private  $date = null;
+	protected  $date = null;
 	
 	/**
 	 * @return mixed
@@ -199,15 +199,20 @@ class OrderModel extends Model {
 	public function setDate( $date) {
 		$this->date = $date;
 	}
-
-	// Constructor
-	// @ Override
-	public function __construct( $data = null) {
-		parent::__construct( $data);
-		if ( ! is_null( $this->options))
-			$this->options = json_encode( $this->options);
-	}
 	
+	// Get all properties
+	public function getProperties( $null = false) {
+		$properties = get_object_vars( $this);
+		// Unset table properties
+		unset( $properties['table']);
+		if ( $null) { // Remove null values
+			foreach ( $properties as $key => $value) {
+				if ( is_null( $value)) unset( $properties[$key]);
+			}
+		}
+		return $properties;
+	}
+
 	// Get all properties names
 	// @ Override
 	public function getPropertiesNames( $default = true) {

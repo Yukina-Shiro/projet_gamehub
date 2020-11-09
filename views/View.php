@@ -6,9 +6,9 @@ class View {
 	
 	protected $data = null;
 	
-	public static $view_dir = __DIR__;
+	public static $view_dir = __DIR__ . '/';
 	
-	public static $tpl_dir = __DIR__ . "templates/";
+	public static $tpl_dir = __DIR__ . '/templates/';
 	
 	protected $tpl_filename = null;
 	
@@ -26,10 +26,13 @@ class View {
 		// "OrderCreateView.php"
 		$class_filename = self::$view_dir . $class_name . ".php";
 		if ( file_exists( $class_filename)) {
-			// charger le fichier "views/OrderCreateView.php"
+			// Load "views/OrderCreateView.php"
 			include $class_filename;
+			// Set template file name
 			$tpl_filename = self::$tpl_dir . $class_prefix . "Tpl.php";
-			$view = new $class_name( $model, $action, $data, $tpl_filename);
+			// View instance
+			$view = new $class_name( $data, $tpl_filename);
+			// Object return
 			return $view;
 		} else {
 			throw new InvalidArgumentException( "Class File $class_filename not found !");
@@ -43,9 +46,11 @@ class View {
 	
 	// Fetch template
 	public function fetch() {
-		// Return the template content
+		// Turn on output buffering
 		ob_start();
+		// Load the template
 		require $this->tpl_filename;
+		// Return the template content
 		return ob_get_clean();
 	}
 }
