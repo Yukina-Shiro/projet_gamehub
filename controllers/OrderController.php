@@ -94,7 +94,7 @@ class OrderController extends Controller {
 		// Add options price
 		$total_price += $this->options_price;
 		
-		// Return price
+		// Set the Return price
 		$this->model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
 		if ( is_numeric( $this->model->getReturnPrice())) {
 			$total_price -= $this->model->getReturnPrice();
