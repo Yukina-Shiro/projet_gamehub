@@ -103,7 +103,7 @@ class OrderController extends Controller {
 		// Set model price
 		$this->model->setTotalPrice( $total_price);
 		
-		// Get all the view properties
+		// Get all the controler properties
 		$data = $this->getProperties();
 		
 		// View instance
