@@ -4,8 +4,6 @@
  * @version : 1.0
  */
 
-require_once __DIR__ . '/../views/View.php';
-
 // Load local database
 require_once __DIR__ . '/../data/Cars.php';
 
@@ -64,7 +62,7 @@ class OrderController extends Controller {
 			if ( $key != $this->model->getGearbox())
 				$this->checked_gearboxes[$key] = '';
 			else
-				$this->checked_gearboxes[$key] = 'checked';
+				$this->checked_gearboxes[$key] = 'checked="checked"';
 		}
 		
 		// Selected color (Radio button)
@@ -80,14 +78,14 @@ class OrderController extends Controller {
 			if ( $key != $this->color)
 				$this->checked_colors[$key] = '';
 			else
-				$this->checked_colors[$key] = 'checked';
+				$this->checked_colors[$key] = 'checked="checked"';
 		}
 
 		// Selected options (Checkbox)
 		$this->options = filter_input( $method, 'options', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 		foreach ( Cars::$options as $key => $value) {
 			if ( isset( $this->options[$key])) {
-				$this->checked_options[$key] = 'checked';
+				$this->checked_options[$key] = 'checked="checked"';
 				$this->options_price += Cars::$options[$key]['price'];
 			} else {
 				$this->checked_options[$key] = '';
@@ -97,8 +95,10 @@ class OrderController extends Controller {
 		$total_price += $this->options_price;
 		
 		// Return price
-		$this->return_price = filter_input( $method, 'return_price', FILTER_SANITIZE_NUMBER_INT);
-		$total_price -= $this->return_price;
+		$this->model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
+		if ( is_numeric( $this->model->getReturnPrice())) {
+			$total_price -= $this->model->getReturnPrice();
+		}
 
 		// Set model price
 		$this->model->setTotalPrice( $total_price);
@@ -120,6 +120,7 @@ class OrderController extends Controller {
 		// Unset the DAO and the Model object
 		unset( $properties['dao'], $properties['model']);
 		// Merge with Model properties
+		if ( Config::VERBOSE) var_dump( $properties, $this->model->getProperties());
 		return array_merge( $properties, $this->model->getProperties());
 	}
 	

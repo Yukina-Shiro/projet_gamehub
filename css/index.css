@@ -66,8 +66,8 @@
 }
 
 .elegant-aero select {
-	background: #fbfbfb url('down-arrow.png') no-repeat right;
-	background: #fbfbfb url('down-arrow.png') no-repeat right;
+	background: #fbfbfb;
+	background: #fbfbfb;
 	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;

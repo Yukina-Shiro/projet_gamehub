@@ -2,15 +2,19 @@
 
 class Config {
 	
-	const  DEBUG = true;
+	// Debug Mode
+	const DEBUG = true;
 	
+	// Verbose mode
+	const  VERBOSE = false;
+	
+	// Database connection
 	const DBTYPE = 'pgsql';
 	const DBHOST = 'localhost';
-	const DBPORT = 5432;
-
-	const DBNAME = 'jmbruneau@iutnice.unice.fr';
-	const DBUSER = 'jmbruneau@iutnice.unice.fr';
-	const DBPASSWD = 'jmbruneau';
+	const DBPORT = 5433; // 5432 sur linserv-info-03
+	const DBNAME = 'car-workshop';
+	const DBUSER = 'jmbruneau';
+	const DBPASSWD = '<jmb!5433>';
 	
 }
 ?>

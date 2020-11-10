@@ -1,7 +1,8 @@
 <?php
 //
 // View Factory
-// 
+//
+
 class View {
 	
 	protected $data = null;
@@ -24,12 +25,12 @@ class View {
 		$class_prefix =  ucwords( $model) . ucwords( $action);
 		$class_name = $class_prefix . "View";
 		// "OrderCreateView.php"
-		$class_filename = self::$view_dir . $class_name . ".php";
+		$class_filename = self::$view_dir . $class_name . '.php';
 		if ( file_exists( $class_filename)) {
 			// Load "views/OrderCreateView.php"
 			include $class_filename;
 			// Set template file name
-			$tpl_filename = self::$tpl_dir . $class_prefix . "Tpl.php";
+			$tpl_filename = self::$tpl_dir . $class_prefix . '.tpl.php';
 			// View instance
 			$view = new $class_name( $data, $tpl_filename);
 			// Object return
@@ -48,6 +49,8 @@ class View {
 	public function fetch() {
 		// Turn on output buffering
 		ob_start();
+		// Define $data[]
+		$data = $this->data;
 		// Load the template
 		require $this->tpl_filename;
 		// Return the template content

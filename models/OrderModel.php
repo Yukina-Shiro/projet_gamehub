@@ -4,14 +4,12 @@
  * @version : 1.0
  */
 
-require_once __DIR__ . '/Model.php';
-
 // Order model
 class OrderModel extends Model {
 	
 	const DEBUG = false;
 	
-	public $table = 'orders';
+	public $table = 'public.orders';
 	
 	// Forms fields
 	protected $lastname = null;
@@ -203,7 +201,7 @@ class OrderModel extends Model {
 	// Get all properties
 	public function getProperties( $null = false) {
 		$properties = get_object_vars( $this);
-		// Unset table properties
+		// Unset table property
 		unset( $properties['table']);
 		if ( $null) { // Remove null values
 			foreach ( $properties as $key => $value) {

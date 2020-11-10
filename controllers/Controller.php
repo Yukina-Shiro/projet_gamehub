@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../views/View.php';
+
 require_once __DIR__ . '/../dao/DAO.php';
 
 //
@@ -19,9 +21,9 @@ class Controller {
 	
 	public static function factory( $model_name, $model) {
 		// "order" => "Order" => "OrderController"
-		$class_name = ucwords( $model_name) . "Controller";
+		$class_name = ucwords( $model_name) . 'Controller';
 		// "OrderController.php"
-		$class_filename = self::$controller_dir . $class_name . ".php";
+		$class_filename = self::$controller_dir . $class_name . '.php';
 		if ( file_exists( $class_filename)) {
 			// Load "controllers/OrderController.php"
 			require $class_filename;

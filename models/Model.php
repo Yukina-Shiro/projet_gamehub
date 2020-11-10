@@ -29,10 +29,11 @@ class Model {
 		// "order" -> "Order" => "OrderModel"
 		$class_name =  ucwords( $name) . 'Model';
 		// Path to "OrderModel.php"
-		$class_filename = self::$model_dir . $class_name . ".php";
+		$class_filename = self::$model_dir . $class_name . '.php';
 		if ( file_exists( $class_filename)) {
 			// inclusion du fichier "models/OrderModel.php"
 			include $class_filename;
+			// 
 			$model = new $class_name();
 			return $model;
 		} else {
