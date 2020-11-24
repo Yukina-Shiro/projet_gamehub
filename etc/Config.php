@@ -1,4 +1,5 @@
 <?php
+namespace mvcCore\Etc;
 
 class Config {
 	

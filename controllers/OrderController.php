@@ -1,11 +1,14 @@
 <?php
+namespace mvcCore\Controllers;
+
+use mvcCore\Etc\Config;
+use mvcCore\Data\Cars;
+use mvcCore\Views\View;
+
 /*
  * @author : Jean-Michel Bruneau
  * @version : 1.0
  */
-
-// Load local database
-require_once __DIR__ . '/../data/Cars.php';
 
 class OrderController extends Controller {
 	

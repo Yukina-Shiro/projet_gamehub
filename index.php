@@ -1,17 +1,17 @@
 <?php
+// Start a session
+session_start();
 //
 // URL sample :
 //		index.pho?model=order&action=create
 //
 
-// Load config
-require_once __DIR__ . '/etc/Config.php';
+// Autoloader
+require __DIR__ . '/vendor/autoload.php';
 
-// Load Model
-require_once __DIR__ . '/models/Model.php';
-
-// Load controller
-require_once __DIR__ . '/controllers/Controller.php';
+use mvcCore\Etc\Config;
+use mvcCore\Models\Model;
+use mvcCore\Controllers\Controller;
 
 // Set debug mode
 if ( Config::DEBUG) {

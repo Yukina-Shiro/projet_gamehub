@@ -1,4 +1,6 @@
 <?php
+namespace mvcCore\Models;
+
 /*
  * @author : Jean-Michel Bruneau
  * @version : 1.0

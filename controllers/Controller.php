@@ -1,13 +1,13 @@
 <?php
+namespace mvcCore\Controllers;
 
-require_once __DIR__ . '/../views/View.php';
-
-require_once __DIR__ . '/../dao/DAO.php';
+use mvcCore\Etc\Config;
+use mvcCore\Dao\DAO;
 
 //
 // Controller Factory
 //
-class Controller {
+abstract class Controller {
 
 	public static $controller_dir = __DIR__ . '/';
 	
@@ -19,18 +19,18 @@ class Controller {
 		$this->dao = new DAO( Config::DBTYPE,Config::DBHOST, Config::DBPORT, Config::DBNAME, Config::DBUSER, Config::DBPASSWD);
 	}
 	
-	public static function factory( $model_name, $model) {
+	public static function factory( string $model_name, $model) {
 		// "order" => "Order" => "OrderController"
 		$class_name = ucwords( $model_name) . 'Controller';
 		// "OrderController.php"
 		$class_filename = self::$controller_dir . $class_name . '.php';
 		if ( file_exists( $class_filename)) {
-			// Load "controllers/OrderController.php"
-			require $class_filename;
-			$ctrl = new $class_name( $model);
+			// Class name with namespace
+			$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
+			$ctrl = new $class( $model);
 			return $ctrl;
 		} else {
-			throw new InvalidArgumentException( "Class File $class_filename not found !");
+			throw new \InvalidArgumentException( "Class File $class_filename not found !");
 		}
 	}
 	
@@ -39,9 +39,7 @@ class Controller {
 	// 
 	// Create
 	// @Override
-	public function create( $method = INPUT_POST) {
-		// To be define
-	}
+	public abstract function create( $method = INPUT_POST);
 	
 	// Read
 	// @Override

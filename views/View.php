@@ -1,9 +1,10 @@
 <?php
+namespace mvcCore\Views;
 //
 // View Factory
 //
 
-class View {
+abstract class View {
 	
 	protected $data = null;
 	
@@ -27,16 +28,16 @@ class View {
 		// "OrderCreateView.php"
 		$class_filename = self::$view_dir . $class_name . '.php';
 		if ( file_exists( $class_filename)) {
-			// Load "views/OrderCreateView.php"
-			include $class_filename;
+			// Class name with namespace
+			$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
 			// Set template file name
 			$tpl_filename = self::$tpl_dir . $class_prefix . '.tpl.php';
 			// View instance
-			$view = new $class_name( $data, $tpl_filename);
+			$view = new $class( $data, $tpl_filename);
 			// Object return
 			return $view;
 		} else {
-			throw new InvalidArgumentException( "Class File $class_filename not found !");
+			throw new \InvalidArgumentException( "Class File $class_filename not found !");
 		}
 	}
 	

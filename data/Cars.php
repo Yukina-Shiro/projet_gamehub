@@ -1,4 +1,6 @@
 <?php
+namespace mvcCore\Data;
+
 class Cars {
 	public static $brends = array (
 		// Brend => Model => Price

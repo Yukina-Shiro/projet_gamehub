@@ -1,0 +1,26 @@
+{
+	"name" : "jmbruneau/mvc-core",
+	"description" : "Basic MVC PHP Framework",
+	"type" : "project",
+	"license" : "GPL",
+	"authors" : [{
+			"name" : "Jean-Michel BRUNEAU",
+			"email" : "jean-michel@netspace.mc"
+		}
+	],
+	"require" : {
+		"composer/composer" : "^2.0",
+		"twbs/bootstrap" : "4.5.3"
+	},
+	"autoload" : {
+		"classmap" : [
+				"controllers",
+				"dao",
+				"data",
+				"etc",
+				"models",
+				"views",
+				"views/templates"
+			]
+	}
+}

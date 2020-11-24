@@ -1,11 +1,13 @@
 <?php
+namespace mvcCore\Models;
+
 /*
  * @author : Jean-Michel Bruneau
  * @version : 1.0
  */
 
 // Model Factory
-class Model {
+abstract class Model {
 	
 	public static $model_dir = __DIR__ . '/';
 	
@@ -31,13 +33,12 @@ class Model {
 		// Path to "OrderModel.php"
 		$class_filename = self::$model_dir . $class_name . '.php';
 		if ( file_exists( $class_filename)) {
-			// inclusion du fichier "models/OrderModel.php"
-			include $class_filename;
-			// 
-			$model = new $class_name();
+			// Class name with namespace
+			$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
+			$model = new $class();
 			return $model;
 		} else {
-			throw new InvalidArgumentException( "Class File $class_filename not found !");
+			throw new \InvalidArgumentException( "Class File $class_filename not found !");
 		}
 	}
 

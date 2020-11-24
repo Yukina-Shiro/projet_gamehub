@@ -1,4 +1,6 @@
 <?php
+namespace mvcCore\Dao;
+
 /*
  * @author : Jean-Michel Bruneau
  * @version : 1.0
@@ -42,8 +44,8 @@ class DAO {
 	private function pdo() {
 		if ( self::$pdo == null) {
 			try {
-				self::$pdo = new PDO(self::$dsn, self::$dbuser, self::$dbpasswd, array( PDO::ATTR_PERSISTENT => true));
-			} catch (PDOException $e) {
+				self::$pdo = new \PDO(self::$dsn, self::$dbuser, self::$dbpasswd, array( \PDO::ATTR_PERSISTENT => true));
+			} catch (\PDOException $e) {
 				print "Database commection error : " . $e->getMessage();
 				die();
 			}
