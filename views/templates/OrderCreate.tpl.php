@@ -49,7 +49,7 @@ use mvcCore\Data\Cars;
 			?>
 			</select>
 			<!--  Model -->
-			<select id="model" name="model" required="required" onchange="document.getElementById('order_create').submit();">
+			<select id="model" class="auto_submit" name="model" required="required">
 				<option value="">Modèle ?</option>
 				<?php
 				foreach ( Cars::$brends[$data['brend']] as $model => $prices) {

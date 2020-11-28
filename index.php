@@ -29,7 +29,7 @@ $model_action =  filter_input( INPUT_GET, 'action', FILTER_SANITIZE_STRING);
 $model = Model::factory( $model_name);
 
 // New Controller with a factory
-$controller = Controller::factory($model_name, $model);
+$controller = Controller::factory( $model);
 
 // Action for this controller
 if ( method_exists( $controller, $model_action)) {

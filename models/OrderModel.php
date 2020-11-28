@@ -8,10 +8,18 @@ namespace mvcCore\Models;
 
 // Order model
 class OrderModel extends Model {
+	// Debug mode
+	public const DEBUG = false;
 	
-	const DEBUG = false;
+	// Model name
+	public static $_model_name = 'order';
 	
-	public $table = 'public.orders';
+	// SQL table name
+	public static $_model_table = 'public.orders';
+	
+	/**
+	 * Orders model properties
+	 */
 	
 	// Forms fields
 	protected $lastname = null;
@@ -22,21 +30,66 @@ class OrderModel extends Model {
 	protected $model = null;
 	protected $gearbox = null;
 	protected $color = null;
-	// JSON of an array()
+	
+	// JSON of a PHP array()
 	protected $options = null;
 
 	protected $return_price = null;
-	
 	protected $total_price = null;
 	
 	// @Column( default='now()')
 	protected  $date = null;
 	
+	// Get all properties
+	public function getProperties( $empty = true, $default = true) {
+		// Get all properties
+		$properties =  parent::getProperties( $empty, $default);
+		// Unset modelName and modelTable property
+		unset( $properties['_model_name'], $properties['_model_table'],);
+		if ( $default) { // Remove properties  with a default value
+			unset( $properties['date']);
+		}
+		return $properties;
+	}
+
+	// Get all properties names
+	// @ Override
+	public function getPropertiesNames( $default = true) {
+		// Get all properties names
+		$properties_names = parent::getPropertiesNames( $default);
+		if ( $default) { // Remove properties names with a default value
+			unset( $properties_names['date']);
+		}
+		return $properties_names;
+	}
+
+	
 	/**
-	 * @return mixed
+	 * @return string
 	 */
-	public function getId() {
-		return $this->id;
+	public static function getModelName() {
+		return OrderModel::$_model_name;
+	}
+
+	/**
+	 * @param string $_model_name
+	 */
+	public static function setModelName( $_model_name) {
+		OrderModel::$_model_name = $_model_name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getModelTable() {
+		return OrderModel::$_model_table;
+	}
+
+	/**
+	 * @param string $_model_table
+	 */
+	public static function setModelTable( $_model_table) {
+		OrderModel::$_model_table = $_model_table;
 	}
 
 	/**
@@ -45,182 +98,149 @@ class OrderModel extends Model {
 	public function getLastname() {
 		return $this->lastname;
 	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getFirstname() {
-		return $this->firstname;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getEmail() {
-		return $this->email;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getBrend() {
-		return $this->brend;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getModel() {
-		return $this->model;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getGearbox() {
-		return $this->gearbox;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getColor() {
-		return $this->color;
-	}
-
-	/**
-	 * @return multitype:
-	 */
-	public function getOptions() {
-		return json_decode( $this->options);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getReturnPrice() {
-		return $this->return_price;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getTotalPrice() {
-		return $this->total_price;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getDate() {
-		return $this->date;
-	}
-
-	/**
-	 * @param mixed $id
-	 */
-	public function setId( $id) {
-		$this->id = $id;
-	}
-
+	
 	/**
 	 * @param mixed $lastname
 	 */
 	public function setLastname( $lastname) {
 		$this->lastname = $lastname;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getFirstname() {
+		return $this->firstname;
+	}
+	
 	/**
 	 * @param mixed $firstname
 	 */
 	public function setFirstname( $firstname) {
 		$this->firstname = $firstname;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getEmail() {
+		return $this->email;
+	}
+	
 	/**
 	 * @param mixed $email
 	 */
 	public function setEmail( $email) {
 		$this->email = $email;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getBrend() {
+		return $this->brend;
+	}
 	/**
 	 * @param mixed $brend
 	 */
 	public function setBrend( $brend) {
 		$this->brend = $brend;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getModel() {
+		return $this->model;
+	}
+	
 	/**
 	 * @param mixed $model
 	 */
 	public function setModel( $model) {
 		$this->model = $model;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getGearbox() {
+		return $this->gearbox;
+	}
+	
 	/**
 	 * @param mixed $gearbox
 	 */
 	public function setGearbox( $gearbox) {
 		$this->gearbox = $gearbox;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getColor() {
+		return $this->color;
+	}
+	
 	/**
 	 * @param mixed $color
 	 */
 	public function setColor( $color) {
 		$this->color = $color;
 	}
-
+	/**
+	 * @return multitype:
+	 */
+	public function getOptions() {
+		return json_decode( $this->options);
+	}
+	
 	/**
 	 * @param multitype: $options
 	 */
 	public function setOptions( $options) {
 		$this->options = json_encode( $options);
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getReturnPrice() {
+		return $this->return_price;
+	}
+	
 	/**
 	 * @param mixed $return_price
 	 */
 	public function setReturnPrice( $return_price) {
 		$this->return_price = $return_price;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getTotalPrice() {
+		return $this->total_price;
+	}
 	/**
 	 * @param mixed $total_price
 	 */
 	public function setTotalPrice( $total_price) {
 		$this->total_price = $total_price;
 	}
-
+	
+	/**
+	 * @return mixed
+	 */
+	public function getDate() {
+		return $this->date;
+	}
+	
 	/**
 	 * @param mixed $date
 	 */
 	public function setDate( $date) {
 		$this->date = $date;
-	}
-	
-	// Get all properties
-	public function getProperties( $null = false) {
-		$properties = get_object_vars( $this);
-		// Unset table property
-		unset( $properties['table']);
-		if ( $null) { // Remove null values
-			foreach ( $properties as $key => $value) {
-				if ( is_null( $value)) unset( $properties[$key]);
-			}
-		}
-		return $properties;
-	}
-
-	// Get all properties names
-	// @ Override
-	public function getPropertiesNames( $default = true) {
-		$properties_names = parent::getPropertiesNames( $default);
-		if ( $default) { // Remove properties names with a default value
-			$properties_names = array_diff( $properties_names, array( 'date'));
-		}
-		return $properties_names;
 	}
 	
 }

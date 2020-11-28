@@ -14,11 +14,8 @@ class OrderController extends Controller {
 	
 	const DEBUG = false;
 	
-	// Model name
-	public static $name = 'order';
-		
-	// Orders Model
-	protected $model;
+	// Orders Model object
+	protected $__model;
 	
 	// View specifics fields
 	protected $checked_gearboxes = array ();
@@ -31,38 +28,38 @@ class OrderController extends Controller {
 	protected $options_price = 0;
 	
 	public function __construct( $model) {
-		$this->model = $model;
+		$this->__model = $model;
 		parent::__construct();
 	}
 	
 	// Create new order
 	public function create( $method = INPUT_POST) {
 		// Set Lastname, Firstname and Email
-		$this->model->setLastname( filter_input( $method, 'lastname', FILTER_SANITIZE_STRING));
-		$this->model->setFirstname(filter_input( $method, 'firstname', FILTER_SANITIZE_STRING));
-		$this->model->setEmail( filter_input( $method, 'email', FILTER_SANITIZE_EMAIL));
+		$this->__model->setLastname( filter_input( $method, 'lastname', FILTER_SANITIZE_STRING));
+		$this->__model->setFirstname(filter_input( $method, 'firstname', FILTER_SANITIZE_STRING));
+		$this->__model->setEmail( filter_input( $method, 'email', FILTER_SANITIZE_EMAIL));
 		
 		// Set Brend and Model
-		$this->model->setBrend( filter_input( $method, 'brend', FILTER_SANITIZE_STRING));
-		$this->model->setModel( filter_input( $method, 'model', FILTER_SANITIZE_STRING));
+		$this->__model->setBrend( filter_input( $method, 'brend', FILTER_SANITIZE_STRING));
+		$this->__model->setModel( filter_input( $method, 'model', FILTER_SANITIZE_STRING));
 		
-		if ( isset( Cars::$brends[$this->model->getBrend()][$this->model->getModel()])) {
-			$this->model_price = Cars::$brends[$this->model->getBrend()][$this->model->getModel()];
+		if ( isset( Cars::$brends[$this->__model->getBrend()][$this->__model->getModel()])) {
+			$this->model_price = Cars::$brends[$this->__model->getBrend()][$this->__model->getModel()];
 		}
 		// Set total price to  model price
 		$total_price = $this->model_price;
 		
 		// Selected gearbox (Radio button)
-		$this->model->setGearbox( filter_input( $method, 'gearbox', FILTER_SANITIZE_STRING));
-		if ( ! is_null( $this->model->getGearbox())) {
-			$this->gearbox_price = Cars::$gearboxes[$this->model->getGearbox()]['price'];
+		$this->__model->setGearbox( filter_input( $method, 'gearbox', FILTER_SANITIZE_STRING));
+		if ( ! is_null( $this->__model->getGearbox())) {
+			$this->gearbox_price = Cars::$gearboxes[$this->__model->getGearbox()]['price'];
 		}
 		// Add gearbox price to total price
 		$total_price += $this->gearbox_price;
 		
 		// Checked gearbox
 		foreach ( Cars::$gearboxes as $key => $value) {
-			if ( $key != $this->model->getGearbox())
+			if ( $key != $this->__model->getGearbox())
 				$this->checked_gearboxes[$key] = '';
 			else
 				$this->checked_gearboxes[$key] = 'checked="checked"';
@@ -98,19 +95,19 @@ class OrderController extends Controller {
 		$total_price += $this->options_price;
 		
 		// Set the Return price
-		$this->model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
-		if ( is_numeric( $this->model->getReturnPrice())) {
-			$total_price -= $this->model->getReturnPrice();
+		$this->__model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
+		if ( is_numeric( $this->__model->getReturnPrice())) {
+			$total_price -= $this->__model->getReturnPrice();
 		}
 
 		// Set model price
-		$this->model->setTotalPrice( $total_price);
+		$this->__model->setTotalPrice( $total_price);
 		
 		// Get all the controler properties
 		$data = $this->getProperties();
 		
 		// View instance
-		$view = View::factory( self::$name, __FUNCTION__, $data);
+		$view = View::factory( $this->__model->getModelName(), __FUNCTION__, $data);
 		
 		// Display view
 		$view->display();
@@ -121,10 +118,10 @@ class OrderController extends Controller {
 		// View properties
 		$properties = get_object_vars( $this);
 		// Unset the DAO and the Model object
-		unset( $properties['dao'], $properties['model']);
+		unset( $properties['__dao'], $properties['__model']);
 		// Merge with Model properties
-		if ( Config::VERBOSE) var_dump( $properties, $this->model->getProperties());
-		return array_merge( $properties, $this->model->getProperties());
+		if ( Config::VERBOSE) var_dump( $properties, $this->__model->getProperties());
+		return array_merge( $properties, $this->__model->getProperties());
 	}
 	
 }
