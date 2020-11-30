@@ -20,12 +20,13 @@ abstract class Controller {
 	public static function factory( $model) {
 		// "order" => "Order" => "OrderController"
 		$class_name = ucwords( $model->getModelName()) . 'Controller';
+		// Class name with namespace
 		$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
 		if ( class_exists( $class)) {
 			$object = new $class( $model);
 			return $object;
 		} else {
-			throw new \InvalidArgumentException( "Class File $class not found !");
+			throw new \InvalidArgumentException( "Class $class not found !");
 		}
 	}
 	

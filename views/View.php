@@ -6,13 +6,14 @@ namespace mvcCore\Views;
 
 abstract class View {
 	
+	// Data array()
 	protected $data = null;
-	
-	public static $view_dir = __DIR__ . '/';
-	
+		
 	public static $tpl_dir = __DIR__ . '/templates/';
 	
 	protected $tpl_filename = null;
+	
+	public static $tpl_filename_suffix = '.tpl.php';
 	
 	// Constructor
 	public function __construct( $data, $tpl_filename) {
@@ -21,23 +22,21 @@ abstract class View {
 	}
 	
 	// Factory
-	public static function factory( $model, $action, $data) {
+	public static function factory( $model_name, $action, $data) {
 		// "order" -> "Order", "create" -> "Create" => "OrderCreateView"
-		$class_prefix =  ucwords( $model) . ucwords( $action);
+		$class_prefix =  ucwords( $model_name) . ucwords( $action);
 		$class_name = $class_prefix . "View";
-		// "OrderCreateView.php"
-		$class_filename = self::$view_dir . $class_name . '.php';
-		if ( file_exists( $class_filename)) {
-			// Class name with namespace
-			$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
+		// Class name with namespace
+		$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
+		if ( class_exists( $class)) {
 			// Set template file name
-			$tpl_filename = self::$tpl_dir . $class_prefix . '.tpl.php';
+			$tpl_filename = self::$tpl_dir . $class_prefix . self::$tpl_filename_suffix;
 			// View instance
-			$view = new $class( $data, $tpl_filename);
+			$object = new $class( $data, $tpl_filename);
 			// Object return
-			return $view;
+			return $object;
 		} else {
-			throw new \InvalidArgumentException( "Class File $class_filename not found !");
+			throw new \InvalidArgumentException( "Class $class not found !");
 		}
 	}
 	
