@@ -2,8 +2,8 @@
 namespace mvcCore\Data;
 
 class Cars {
-	public static $brends = array (
-		// Brend => Model => Price
+	public static $brands = array (
+		// Brand => Model => Price
 		"Renault" => array (
 			"Twingo" => 9990,
 			"Clio" => 12990,

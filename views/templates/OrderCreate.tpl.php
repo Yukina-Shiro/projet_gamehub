@@ -1,6 +1,8 @@
 <?php
 namespace mvcCore\Views\Templates;
+
 use mvcCore\Data\Cars;
+
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
@@ -31,19 +33,19 @@ use mvcCore\Data\Cars;
 			<label for="firstname">Prénom :</label><input id="firstname" name="firstname" type="text" required="required" value="<?= $data['firstname'] ?>"/>
 			<label for="email">Email :</label><input id="email" name="email" type="email" required="required" value="<?= $data['email'] ?>" />
 		</fieldset>
-		<!--  Brend and Model -->
+		<!--  Brand and Model -->
 		<fieldset>
 			<legend>Marque & Modèle : </legend>
-			<!--  Brend -->
-			<select id="brend" class="auto_submit" name="brend" required="required">
+			<!--  Brand -->
+			<select id="brand" class="auto_submit" name="brand" required="required">
 				<!-- Submit on change -->
 				<option value="">Marque ?</option>
 			<?php
-			foreach ( Cars::$brends as $brend => $models) {
-				if ( $brend == $data['brend']) {
-					echo "<option value=\"$brend\" selected=\"selected\">$brend</option>";
+			foreach ( Cars::$brands as $brand => $models) {
+				if ( $brand == $data['brand']) {
+					echo "<option value=\"$brand\" selected=\"selected\">$brand</option>";
 				} else {
-					echo "<option value=\"$brend\">$brend</option>";
+					echo "<option value=\"$brand\">$brand</option>";
 				}
 			}
 			?>
@@ -52,7 +54,7 @@ use mvcCore\Data\Cars;
 			<select id="model" class="auto_submit" name="model" required="required">
 				<option value="">Modèle ?</option>
 				<?php
-				foreach ( Cars::$brends[$data['brend']] as $model => $prices) {
+				foreach ( Cars::$brands[$data['brand']] as $model => $prices) {
 					if ( $model == $data['model']) {
 						echo "<option value=\"$model\" selected=\"selected\">$model</option>";
 					} else {

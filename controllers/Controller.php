@@ -9,6 +9,9 @@ use mvcCore\Dao\DAO;
 //
 abstract class Controller {
 	
+	// Orders Model object
+	protected $__model;
+	
 	// Database access
 	protected $__dao;
 	
@@ -29,6 +32,21 @@ abstract class Controller {
 			throw new \InvalidArgumentException( "Class $class not found !");
 		}
 	}
+	
+	// Get all the view properties
+	public function getProperties() {
+		// View properties
+		$properties = get_object_vars( $this);
+		// Unset the DAO and the Model object
+		unset( $properties['__dao'], $properties['__model']);
+		// Merge with Model properties
+		if ( Config::VERBOSE) var_dump( $properties, $this->__model->getProperties());
+		return array_merge( $properties, $this->__model->getProperties());
+	}
+	
+	// Get inputs and set model properties
+	// @Override
+	public abstract function input();
 	
 	/**
 	 * CRUD : Create, Read, Update, Delete, …
@@ -56,6 +74,71 @@ abstract class Controller {
 		
 	}
 	
-	// Others…
+	//
+	// Display action
+	//
+	public function display() {
+		$view = View::factory( $this->model, __FUNCTION__);
+		// Display the view
+		$view->display();
+	}
+	
+	// Redirect URL
+	public static function redirect( $params = array(), $anchor = '') {
+		// Define the protocol
+		$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+		// Define the full current URL
+		$url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		// Url object instance
+		$url = new Url( $url);
+		// Add or update the URL parameters
+		foreach ( $GLOBALS['request'] as $param => $value) {
+			if ( isset( $params[$param]) && ! empty( $params[$param]))
+				$url->add( $param, $params[$param]);
+		}
+		if ( self::DEBUG) var_dump ( $url->toString());
+		// Set the new anchor and redirect
+		$url->setAnchor( $anchor)->redirect();
+	}
+
+	//
+	// Persist an object
+	//
+	public function persist( $action = 'read') {
+		// Put Input data into the model
+		$this->input();
+		// Get data (not the null and the default ones)
+		$data = $this->model->getProperties();
+		// Display data in debug mode
+		if ( self::DEBUG) var_dump( $data);
+		// Encrypt data
+		$encrypt_data = $this->model->encrypt( $data);
+		// Persist the object and get the new id
+		$model_class = $this->model::$class_name;
+		$id = $this->dao->create( $model_class::$table, $encrypt_data);
+		if ( empty( $id)) {
+			// Display an error !
+			die( "An error was occured !");
+		} else { // Redirect to "read" action with the new id
+			$this->redirect( array( 'action' => $action, 'id' => $id));
+		}
+	}
+	
+	//
+	// Remove an object
+	//
+	public function remove( $action = 'read') {
+		// Get input id from $GLOBALS['request']
+		$id = $GLOBALS['request']['id'];
+		// Delete the object with the current id
+		$model_class = $this->model::$class_name;
+		$result = $this->dao->delete( $model_class::$table, $id);
+		if ( empty( $result)) {
+			// Display an error !
+			die( "An error has occured !");
+		} else { // Redirect to the home page
+			$this->redirect( array( 'action' => $action, 'model' => $this->model::$name));
+		}
+	}
 }
 ?>

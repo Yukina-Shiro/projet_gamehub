@@ -26,7 +26,7 @@ class OrderModel extends Model {
 	protected $firstname = null;
 	protected $email = null;
 	
-	protected $brend = null;
+	protected $brand = null;
 	protected $model = null;
 	protected $gearbox = null;
 	protected $color = null;
@@ -137,14 +137,14 @@ class OrderModel extends Model {
 	/**
 	 * @return mixed
 	 */
-	public function getBrend() {
-		return $this->brend;
+	public function getBrand() {
+		return $this->brand;
 	}
 	/**
 	 * @param mixed $brend
 	 */
-	public function setBrend( $brend) {
-		$this->brend = $brend;
+	public function setBrand( $brand) {
+		$this->brand = $brand;
 	}
 	
 	/**
@@ -191,15 +191,15 @@ class OrderModel extends Model {
 	/**
 	 * @return multitype:
 	 */
-	public function getOptions() {
-		return json_decode( $this->options);
+	public function getOptions( $decode = true) {
+		return ( $decode) ? json_decode( $this->options, true) : $this->options;
 	}
 	
 	/**
 	 * @param multitype: $options
 	 */
-	public function setOptions( $options) {
-		$this->options = json_encode( $options);
+	public function setOptions( $options, $encode = true) {
+		$this->options = ( $encode) ? json_encode( $options) : $options;
 	}
 	
 	/**

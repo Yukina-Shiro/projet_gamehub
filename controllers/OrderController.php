@@ -12,116 +12,82 @@ use mvcCore\Views\View;
 
 class OrderController extends Controller {
 	
+	// Debug mode
 	const DEBUG = false;
-	
-	// Orders Model object
-	protected $__model;
-	
-	// View specifics fields
-	protected $checked_gearboxes = array ();
-	protected $checked_colors = array ();
-	protected $checked_options = array ();
-	
-	protected $model_price = 0;
-	protected $gearbox_price = 0;
-	protected $color_price = 0;
-	protected $options_price = 0;
-	
+		
 	public function __construct( $model) {
 		$this->__model = $model;
 		parent::__construct();
 	}
 	
-	// Create new order
-	public function create( $method = INPUT_POST) {
-		// Set Lastname, Firstname and Email
-		$this->__model->setLastname( filter_input( $method, 'lastname', FILTER_SANITIZE_STRING));
-		$this->__model->setFirstname(filter_input( $method, 'firstname', FILTER_SANITIZE_STRING));
-		$this->__model->setEmail( filter_input( $method, 'email', FILTER_SANITIZE_EMAIL));
-		
-		// Set Brend and Model
-		$this->__model->setBrend( filter_input( $method, 'brend', FILTER_SANITIZE_STRING));
-		$this->__model->setModel( filter_input( $method, 'model', FILTER_SANITIZE_STRING));
-		
-		if ( isset( Cars::$brends[$this->__model->getBrend()][$this->__model->getModel()])) {
-			$this->model_price = Cars::$brends[$this->__model->getBrend()][$this->__model->getModel()];
+	// Compute total price
+	private function _total_price() {
+		$total_price = 0;
+		if ( isset( Cars::$brands[$this->__model->getBrand()][$this->__model->getModel()])) {
+			$total_price = Cars::$brands[$this->__model->getBrand()][$this->__model->getModel()];
 		}
-		// Set total price to  model price
-		$total_price = $this->model_price;
-		
 		// Selected gearbox (Radio button)
-		$this->__model->setGearbox( filter_input( $method, 'gearbox', FILTER_SANITIZE_STRING));
 		if ( ! is_null( $this->__model->getGearbox())) {
-			$this->gearbox_price = Cars::$gearboxes[$this->__model->getGearbox()]['price'];
+			$total_price += Cars::$gearboxes[$this->__model->getGearbox()]['price'];
 		}
-		// Add gearbox price to total price
-		$total_price += $this->gearbox_price;
-		
-		// Checked gearbox
-		foreach ( Cars::$gearboxes as $key => $value) {
-			if ( $key != $this->__model->getGearbox())
-				$this->checked_gearboxes[$key] = '';
-			else
-				$this->checked_gearboxes[$key] = 'checked="checked"';
-		}
-		
 		// Selected color (Radio button)
-		$this->color = filter_input( INPUT_POST, 'color', FILTER_SANITIZE_STRING);
-		if ( ! is_null( $this->color)) {
-			$this->color_price = Cars::$colors[$this->color]['price'];
+		if ( ! is_null( $this->__model->getColor())) {
+			$total_price += Cars::$colors[$this->__model->getColor()]['price'];
 		}
-		// Add color price
-		$total_price += $this->color_price;
-		
-		// Checked color
-		foreach ( Cars::$colors as $key => $value) {
-			if ( $key != $this->color)
-				$this->checked_colors[$key] = '';
-			else
-				$this->checked_colors[$key] = 'checked="checked"';
-		}
-
 		// Selected options (Checkbox)
-		$this->options = filter_input( $method, 'options', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 		foreach ( Cars::$options as $key => $value) {
-			if ( isset( $this->options[$key])) {
-				$this->checked_options[$key] = 'checked="checked"';
-				$this->options_price += Cars::$options[$key]['price'];
-			} else {
-				$this->checked_options[$key] = '';
-			}
+			if ( isset( $this->__model->getOptions()[$key]))
+				$total_price += Cars::$options[$key]['price'];
 		}
-		// Add options price
-		$total_price += $this->options_price;
-		
-		// Set the Return price
-		$this->__model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
+		// Return price
 		if ( is_numeric( $this->__model->getReturnPrice())) {
 			$total_price -= $this->__model->getReturnPrice();
 		}
-
 		// Set model price
 		$this->__model->setTotalPrice( $total_price);
-		
-		// Get all the controler properties
-		$data = $this->getProperties();
-		
-		// View instance
-		$view = View::factory( $this->__model->getModelName(), __FUNCTION__, $data);
-		
-		// Display view
-		$view->display();
 	}
 	
-	// Get all the view properties
-	public function getProperties() {
-		// View properties
-		$properties = get_object_vars( $this);
-		// Unset the DAO and the Model object
-		unset( $properties['__dao'], $properties['__model']);
-		// Merge with Model properties
-		if ( Config::VERBOSE) var_dump( $properties, $this->__model->getProperties());
-		return array_merge( $properties, $this->__model->getProperties());
+	//
+	// Get inputs and set model properties
+	// @Override
+	public function input() {
+		// Only from POST data
+		if ( count( $_POST) > 0) {
+			// Get and set :
+			// Lastname, Firstname and Email
+			$this->__model->setLastname( filter_input( INPUT_POST, 'lastname', FILTER_SANITIZE_STRING));
+			$this->__model->setFirstname(filter_input( INPUT_POST, 'firstname', FILTER_SANITIZE_STRING));
+			$this->__model->setEmail( filter_input( INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
+			// Brand and Model
+			$this->__model->setBrand( filter_input( INPUT_POST, 'brand', FILTER_SANITIZE_STRING));
+			$this->__model->setModel( filter_input( INPUT_POST, 'model', FILTER_SANITIZE_STRING));
+			// Selected gearbox (Radio button)
+			$this->__model->setGearbox( filter_input( INPUT_POST, 'gearbox', FILTER_SANITIZE_STRING));
+			// Selected color (Radio button)
+			$this->__model->setColor( filter_input( INPUT_POST, 'color', FILTER_SANITIZE_STRING));
+			// Selected options (Checkbox)
+			$this->__model->setOptions( filter_input( INPUT_POST, 'options', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));
+			// Return price
+			$this->__model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
+			// Total price
+			$this->__model->setTotalPrice( filter_input( INPUT_POST, 'total_price', FILTER_SANITIZE_NUMBER_INT));
+		}
+		// Compute total price
+		$this->_total_price();
+	}
+	
+	//
+	// Create new order
+	// @Override
+	public function create( $action = 'read') {
+		// Put Input data into the model
+		$this->input();
+		
+		// View instance ( model object, "create")
+		$view = View::factory( $this->__model, __FUNCTION__);
+		
+		// Display the view
+		$view->display();
 	}
 	
 }

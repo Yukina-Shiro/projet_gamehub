@@ -14,13 +14,13 @@
 	},
 	"autoload" : {
 		"classmap" : [
-				"controllers",
-				"dao",
-				"data",
-				"etc",
-				"models",
-				"views",
-				"views/templates"
-			]
+			"controllers",
+			"dao",
+			"data",
+			"etc",
+			"helpers",
+			"models",
+			"views"
+		]
 	}
 }
