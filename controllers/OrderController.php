@@ -80,7 +80,7 @@ class OrderController extends Controller {
 	// Create new order
 	// @Override
 	public function create( $action = 'read') {
-		// Put Input data into the model
+		// Put Input POST form data into the model
 		$this->input();
 		
 		// View instance ( model object, "create")

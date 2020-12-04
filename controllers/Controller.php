@@ -4,6 +4,8 @@ namespace mvcCore\Controllers;
 use mvcCore\Etc\Config;
 use mvcCore\Dao\DAO;
 
+use mvcCore\Views\View;
+
 //
 // Controller Factory
 //
@@ -20,6 +22,9 @@ abstract class Controller {
 		$this->__dao = new DAO( Config::DBTYPE,Config::DBHOST, Config::DBPORT, Config::DBNAME, Config::DBUSER, Config::DBPASSWD);
 	}
 	
+	//
+	//
+	//
 	public static function factory( $model) {
 		// "order" => "Order" => "OrderController"
 		$class_name = ucwords( $model->getModelName()) . 'Controller';
@@ -83,7 +88,9 @@ abstract class Controller {
 		$view->display();
 	}
 	
+	//
 	// Redirect URL
+	//
 	public static function redirect( $params = array(), $anchor = '') {
 		// Define the protocol
 		$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
@@ -102,20 +109,20 @@ abstract class Controller {
 	}
 
 	//
-	// Persist an object
+	// Persist an object in de data backend (e.g SQL database)
 	//
 	public function persist( $action = 'read') {
 		// Put Input data into the model
 		$this->input();
 		// Get data (not the null and the default ones)
-		$data = $this->model->getProperties();
+		$data = $this->__model->getProperties();
 		// Display data in debug mode
 		if ( self::DEBUG) var_dump( $data);
 		// Encrypt data
-		$encrypt_data = $this->model->encrypt( $data);
+		$encrypt_data = $this->__model->encrypt( $data);
 		// Persist the object and get the new id
-		$model_class = $this->model::$class_name;
-		$id = $this->dao->create( $model_class::$table, $encrypt_data);
+		$model_class = $this->__model::$class_name;
+		$id = $this->__dao->create( $model_class::$table, $encrypt_data);
 		if ( empty( $id)) {
 			// Display an error !
 			die( "An error was occured !");
@@ -125,7 +132,7 @@ abstract class Controller {
 	}
 	
 	//
-	// Remove an object
+	// Remove an object from the data backend (e.g SQL database)
 	//
 	public function remove( $action = 'read') {
 		// Get input id from $GLOBALS['request']

@@ -22,92 +22,141 @@ use mvcCore\Data\Cars;
 <!-- global scripts go here -->
 <script defer="defer" src="js/order/index.js"></script>
 </head>
-<body class="elegant-aero" onload="order.init()">
+<body onload="order.init()">
 	<header>
 		<h1>Bon de commande d'une voiture</h1>
 	</header>
-	<form id="order_create" method="post">
-		<fieldset>
-			<legend>Informations personnelles : </legend>
-			<label for="lastname">Nom :</label><input id="lastname" name="lastname" type="text" required="required" value="<?= $data['lastname'] ?>" />
-			<label for="firstname">Prénom :</label><input id="firstname" name="firstname" type="text" required="required" value="<?= $data['firstname'] ?>"/>
-			<label for="email">Email :</label><input id="email" name="email" type="email" required="required" value="<?= $data['email'] ?>" />
-		</fieldset>
-		<!--  Brand and Model -->
-		<fieldset>
-			<legend>Marque & Modèle : </legend>
-			<!--  Brand -->
-			<select id="brand" class="auto_submit" name="brand" required="required">
-				<!-- Submit on change -->
-				<option value="">Marque ?</option>
+<form id="order_create" method="post" action="">
+	<h3 class="alert alert-primary" role="alert">Bon de Commande de Votre Nouvelle Voiture !</h3>
+	<div class="alert alert-danger" role="alert">Les champs en rouge sont obligatoires !</div>
+	<fieldset class="form-group">
+		<legend>Informations personnelles : </legend>
+		<label for="lastname">Nom :</label><input id="lastname" name="lastname" class="form-control" type="text" required="required" value="<?= $data['lastname'] ?>" /> <label for="firstname">Prénom
+			:</label><input id="firstname" name="firstname" class="form-control" type="text" required="required" value="<?= $data['firstname'] ?>" /> <label for="email">Email :</label><input
+			id="email" name="email" class="form-control" type="email" required="required" value="<?= $data['email'] ?>"
+		/>
+	</fieldset>
+	<!--  Brand choice -->
+	<fieldset class="form-group">
+		<legend>Marque & Modèle : </legend>
+		<select id="brand" name="brand" class="form-control auto_submit" required="required">
+			<option value="">Marque ?</option>
 			<?php
 			foreach ( Cars::$brands as $brand => $models) {
 				if ( $brand == $data['brand']) {
-					echo "<option value=\"$brand\" selected=\"selected\">$brand</option>";
+					echo "<option value=\"$brand\" selected>$brand</option>";
 				} else {
 					echo "<option value=\"$brand\">$brand</option>";
 				}
 			}
 			?>
-			</select>
-			<!--  Model -->
-			<select id="model" class="auto_submit" name="model" required="required">
-				<option value="">Modèle ?</option>
-				<?php
+		</select>
+		<!-- Model choice -->
+		<select id="model" name="model" class="form-control auto_submit" required="required">
+			<option value="">Modèle ?</option>
+			<?php
+			if ( isset( $data['brand'])) {
 				foreach ( Cars::$brands[$data['brand']] as $model => $prices) {
 					if ( $model == $data['model']) {
-						echo "<option value=\"$model\" selected=\"selected\">$model</option>";
+						echo "<option value=\"$model\" selected>$model</option>";
 					} else {
 						echo "<option value=\"$model\">$model</option>";
 					}
 				}
-				?>
+			}
+			?>
 		</select>
-			<!-- Model price -->
-			<label for="model_price">Valeur (€) :</label><input id="model_price" type="number" name="model_price" readonly="readonly" value="<?= $data['model_price'] ?>" />
-		</fieldset>
-		<!-- Gearbox -->
-		<fieldset>
-			<legend>Boite de vitesse : </legend>
-			<label for="gearbox_manual">Manuelle</label><input type="radio" class="auto_submit" name="gearbox" id="gearbox_manual" value="manual" <?= $data['checked_gearboxes']['manual'] ?> /> <label for="gearbox_robotic">Robotisée
-				(1000€)</label><input type="radio" class="auto_submit" name="gearbox" id="gearbox_robotic" value="robotic" <?= $data['checked_gearboxes']['robotic'] ?> /> <label for="gearbox_automatic">Automatique (1500€)</label><input
-				type="radio" class="auto_submit" name="gearbox" id="gearbox_automatic" value="automatic" <?= $data['checked_gearboxes']['automatic'] ?>
-			/> <label for="gearbox_price">Valeur (€) :</label><input id="gearbox_price" type="number" readonly="readonly" value="<?= $data['gearbox_price'] ?>" />
-		</fieldset>
-		<!-- Color -->
-		<fieldset>
-			<legend>Couleur : </legend>
-			<label for="color_standard">Standard</label><input type="radio" class="auto_submit" name="color" id="color_standard" value="standard" <?= $data['checked_colors']['standard'] ?> /> <label for="color_metallic">Métalisé
-				(500€)</label><input type="radio" class="auto_submit" name="color" id="color_metallic" value="metallic" <?= $data['checked_colors']['metallic'] ?> /> <label for="color_nacreous">Nacrée (750€)</label><input
-				type="radio" class="auto_submit" name="color" id="color_nacreous" value="nacreous" <?= $data['checked_colors']['nacreous'] ?>
-			/> <label for="color_price">Valeur (€) :</label><input id="color_price" type="number" readonly="readonly" value="<?= $data['color_price'] ?>" />
-		</fieldset>
-		<!-- Options -->
-		<fieldset>
-			<legend>Options : </legend>
-			<label for="option_reversing_radar"><input type="checkbox" class="auto_submit" name="options[reversing_radar]" id="option_reversing_radar" value="reversing_radar" <?= $data['checked_options']['reversing_radar'] ?> />Radar
-				de recul (300€)</label> <label for="option_xenon_lighthouse"><input type="checkbox" class="auto_submit" name="options[xenon_lighthouse]" id="option_xenon_lighthouse" value="xenon_lighthouse"
-				<?= $data['checked_options']['xenon_lighthouse'] ?>
-			/>Phares au xénon (750€)</label> <label for="option_speed_regulator"><input type="checkbox" class="auto_submit" name="options[speed_regulator]" id="option_speed_regulator" value="speed_regulator"
-				<?= $data['checked_options']['speed_regulator'] ?>
-			/>Régulateur de vitesse (300€)</label> <label for="option_rain_sensor"><input type="checkbox" class="auto_submit" name="options[rain_sensor]" id="option_speed_​​regulator" value="rain_sensor"
-				<?= $data['checked_options']['rain_sensor'] ?>
-			/>Capteur de pluie (250€)</label> <label for="option_air_conditioner"><input type="checkbox" class="auto_submit" name="options[air_conditioner]" id="option_air_conditioner" value="air_conditioner"
-				<?= $data['checked_options']['air_conditioner'] ?>
-			/>Climatisation (1000€)</label> <label for="options_price">Valeur (€) : <input id="options_price" type="number" readonly="readonly" value="<?= $data['options_price'] ?>" /></label>
-		</fieldset>
-		<fieldset>
-			<legend>Reprise de l'ancien véhicule (€) :</legend>
-			<label for="return_price"><input id="return_price" type="number" class="auto_submit" name="return_price" required="required" value="<?= $data['return_price'] ?>" min="0" max="3000" /></label>
-		</fieldset>
-		<fieldset>
-			<legend>Prix total (€) :</legend>
-			<label for="total_price"><input id="total_price" type="number" name="total_price" readonly="readonly" value="<?= $data['total_price'] ?>" /></label>
-		</fieldset>
-		<div>
-			<input type="reset" class="buttonReset" value="Effacer" /><input type="submit" class="buttonSave" value="Sauvegarder" />
+		<!-- Model price -->
+		<label for="model_price">Valeur (€) :</label><input id="model_price" type="number" name="model_price" class="form-control" readonly="readonly" value="<?= $data['model_price'] ?>" />
+	</fieldset>
+	<!-- Gearbox -->
+	<fieldset>
+		<legend>Boite de vitesse : </legend>
+		<div class="form-check">
+			<input type="radio" id="gearbox_manual" name="gearbox" class="form-check-input auto_submit" value="manual" <?= $data['checked_gearboxes']['manual'] ?> /> <label class="form-check-label"
+				for="gearbox_manual"
+			>Manuelle</label>
 		</div>
-	</form>
+		<div class="form-check">
+			<input type="radio" id="gearbox_robotic" name="gearbox" class="form-check-input auto_submit" value="robotic" <?= $data['checked_gearboxes']['robotic'] ?> /> <label class="form-check-label"
+				for="gearbox_robotic"
+			>Robotisée (1000€)</label>
+		</div>
+		<div class="form-check">
+			<input type="radio" id="gearbox_automatic" name="gearbox" class="form-check-input auto_submit" value="automatic" <?= $data['checked_gearboxes']['automatic'] ?> /> <label class="form-check-label"
+				for="gearbox_automatic"
+			>Automatique (1500€)</label>
+		</div>
+		<!--  Gearbox price -->
+		<label for="gearbox_price">Valeur (€) :</label><input id="gearbox_price" class="form-control auto_submit" type="number" readonly="readonly" value="<?= $data['gearbox_price'] ?>" />
+	</fieldset>
+	<!-- Color -->
+	<fieldset>
+		<legend>Couleur : </legend>
+		<div class="form-check">
+			<input type="radio" id="color_standard" name="color" class="form-check-input auto_submit" value="standard" <?= $data['checked_colors']['standard'] ?> /> <label class="form-check-label"
+				for="color_standard"
+			>Standard</label>
+		</div>
+		<div class="form-check">
+			<input type="radio" id="color_metallic" name="color" class="form-check-input auto_submit" value="metallic" <?= $data['checked_colors']['metallic'] ?> /> <label class="form-check-label"
+				for="color_metallic"
+			>Métalisé (500€)</label>
+		</div>
+		<div class="form-check">
+			<input type="radio" id="color_nacreous" name="color" class="form-check-input auto_submit" value="nacreous" <?= $data['checked_colors']['nacreous'] ?> /> <label class="form-check-label"
+				for="color_nacreous"
+			>Nacrée (750€)</label>
+		</div>
+		<!--  Color price -->
+		<label for="color_price">Valeur (€) :</label> <input id="color_price" class="form-control auto_submit" type="number" readonly="readonly" value="<?= $data['color_price'] ?>" />
+	</fieldset>
+	<!-- Options -->
+	<fieldset>
+		<legend>Options : </legend>
+		<div class="form-check">
+			<label class="form-check-label" for="option_reversing_radar"> <input type="checkbox" id="option_reversing_radar" name="options[reversing_radar]" class="form-check-input auto_submit" value="reversing_radar"
+				<?= $data['checked_options']['reversing_radar'] ?>
+			/>Radar de recul (300€)
+			</label>
+		</div>
+		<div class="form-check">
+			<label class="form-check-label" for="option_xenon_lighthouse"><input type="checkbox" id="option_xenon_lighthouse" name="options[xenon_lighthouse]" class="form-check-input auto_submit"
+				value="xenon_lighthouse" <?= $data['checked_options']['xenon_lighthouse'] ?>
+			/>Phares au xénon (750€)</label> 
+		</div>
+		<div class="form-check">
+			<label class="form-check-label" for="option_speed_regulator"><input type="checkbox" id="option_speed_regulator" name="options[speed_regulator]" class="form-check-input auto_submit"
+				value="speed_regulator" <?= $data['checked_options']['speed_regulator'] ?>
+			/>Régulateur de vitesse (300€)</label> 
+		</div>
+		<div class="form-check">
+			<label class="form-check-label" for="option_rain_sensor"> <input type="checkbox" id="option_rain_sensor" name="options[rain_sensor]" class="form-check-input auto_submit" value="rain_sensor"
+				<?= $data['checked_options']['rain_sensor'] ?>
+			/>Capteur de pluie (250€)</label>
+		</div>
+		<div class="form-check">
+			<label class="form-check-label" for="option_air_conditioner"><input type="checkbox" id="option_air_conditioner" name="options[air_conditioner]" class="form-check-input auto_submit"
+				value="air_conditioner" <?= $data['checked_options']['air_conditioner'] ?>
+			/>Climatisation (1000€)</label> 
+		</div>
+		<!-- Options price -->
+		<label for="options_price">Total des options (€) :</label> <input id="options_price" class="form-control" type="number" readonly="readonly" value="<?= $data['options_price'] ?>" />
+	</fieldset>
+	<fieldset>
+		<legend>Reprise de l'ancien véhicule (€) :</legend>
+		<label for="return_price"> <input id="return_price" name="return_price" class="form-control auto_submit" type="number" required="required" value="<?= $data['return_price'] ?>" min="0" max="3000" />
+		</label>
+	</fieldset>
+	<fieldset>
+		<legend>Prix total (€) :</legend>
+		<label for="total_price"> <input id="total_price" name="total_price" class="form-control" type="number" readonly="readonly" value="<?= $data['total_price'] ?>" />
+		</label>
+	</fieldset>
+	<div>
+		<input id="create" type="submit" value="Valider" class="btn btn-primary" /> <input id="persist" type="submit" value="Enregistrer" class="btn btn-success" />
+	</div>
+</form>
 	<footer>
 		<p>© 2020 JM BRUNEAU - UCA</p>
 	</footer>
