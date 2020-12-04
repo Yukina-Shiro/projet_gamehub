@@ -66,6 +66,7 @@ class DAO {
 		// Get value names :
 		// :id, :lastname, :firtsname, :email, …, :return_price, :total_price
 		$values = ':' . implode(", :", array_keys( $data));
+		// ( $data['reversing_radar']) ? 'true' : 'false'
 		
 		// SQL query
 		// e.g. INSERT INTO orders ( lastname, firstname, …) VALUES ( :lastname, :firstname, …);
@@ -97,7 +98,7 @@ _EOS_;
 	// Read ( i.e. Select)
 	// @param $table : table name
 	// @param $data - array( key1 => value1, key2 => value2, …)
-	public function read( $table_name, $object_name, $id = null, $limit = 0, $offset = 0) {
+	public function read( $table_name, $object_class, $id = null, $limit = 0, $offset = 0) {
 		
 		// Connection
 		$this->pdo();
@@ -121,9 +122,10 @@ _EOS_;
 		if ( self::DEBUG) var_dump( 'SELECT =>', $sql, $data);
 		// Prepare and execute statement
 		try {
-			$pst = self::$pdo->prepare( $sql)->execute( $data);
+			$pst = self::$pdo->prepare( $sql);
+			$pst->execute( $data);
 			// Fetch all find object
-			$results = $pst->fetchAll( \PDO::FETCH_CLASS, $object_name);
+			$results = $pst->fetchAll( \PDO::FETCH_CLASS, $object_class);
 		} catch( \PDOException $e) {
 			throw new \UnexpectedValueException( 'DAO SQL Read Exception : ', $e->getMessage());
 		}
@@ -133,7 +135,7 @@ _EOS_;
 	
 	// Update
 	// @param $table_name : table name
-	// @param $object_name : object name
+	// @param $object_class : object name
 	// @param $id : object id
 	public function update( $table_name, $data, $id, $begin_transaction  = true) {
 		// Connection

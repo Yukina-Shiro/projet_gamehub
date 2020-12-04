@@ -3,13 +3,17 @@ namespace mvcCore\Controllers;
 
 use mvcCore\Etc\Config;
 use mvcCore\Dao\DAO;
-
+use mvcCore\Helpers\Url;
 use mvcCore\Views\View;
+
 
 //
 // Controller Factory
 //
 abstract class Controller {
+
+	// Debug mode
+	const DEBUG = true;
 	
 	// Orders Model object
 	protected $__model;
@@ -51,7 +55,7 @@ abstract class Controller {
 	
 	// Get inputs and set model properties
 	// @Override
-	public abstract function input();
+	public abstract function input( $method = INPUT_POST);
 	
 	/**
 	 * CRUD : Create, Read, Update, Delete, …
@@ -59,25 +63,20 @@ abstract class Controller {
 	
 	// Create
 	// @Override
-	public abstract function create( $method = INPUT_POST);
+	public abstract function create( $method = INPUT_POST, $redirect = 'read');
 	
 	// Read
 	// @Override
-	public function read( $method = INPUT_POST) {
-		// To be define
-	}
+	public abstract function read();
 	
 	// Update
 	// @Override
-	public function update( $method = INPUT_POST) {
-		
-	}
+	public abstract function update( $method = INPUT_POST, $redirect = 'read');
 	
 	// Delete
 	// @Override
-	public function delete( $method = INPUT_POST) {
-		
-	}
+	public abstract function delete( $redirect = '');
+
 	
 	//
 	// Display action
@@ -111,7 +110,7 @@ abstract class Controller {
 	//
 	// Persist an object in de data backend (e.g SQL database)
 	//
-	public function persist( $action = 'read') {
+	public function persist( $redirect = 'read') {
 		// Put Input data into the model
 		$this->input();
 		// Get data (not the null and the default ones)
@@ -121,30 +120,30 @@ abstract class Controller {
 		// Encrypt data
 		$encrypt_data = $this->__model->encrypt( $data);
 		// Persist the object and get the new id
-		$model_class = $this->__model::$class_name;
-		$id = $this->__dao->create( $model_class::$table, $encrypt_data);
+		$model_class = get_class( $this->__model);
+		$id = $this->__dao->create( $model_class::$_model_table, $encrypt_data);
 		if ( empty( $id)) {
 			// Display an error !
 			die( "An error was occured !");
 		} else { // Redirect to "read" action with the new id
-			$this->redirect( array( 'action' => $action, 'id' => $id));
+			$this->redirect( array( 'action' => $redirect, 'id' => $id));
 		}
 	}
 	
 	//
 	// Remove an object from the data backend (e.g SQL database)
 	//
-	public function remove( $action = 'read') {
+	public function remove( $redirect = '') {
 		// Get input id from $GLOBALS['request']
 		$id = $GLOBALS['request']['id'];
 		// Delete the object with the current id
-		$model_class = $this->model::$class_name;
-		$result = $this->dao->delete( $model_class::$table, $id);
+		$model_class = $this->__model::$class_name;
+		$result = $this->__dao->delete( $model_class::$_model_table, $id);
 		if ( empty( $result)) {
 			// Display an error !
 			die( "An error has occured !");
 		} else { // Redirect to the home page
-			$this->redirect( array( 'action' => $action, 'model' => $this->model::$name));
+			$this->redirect( array( 'action' => $redirect, 'model' => $model_class));
 		}
 	}
 }

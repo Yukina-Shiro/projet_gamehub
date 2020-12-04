@@ -26,7 +26,7 @@ use mvcCore\Data\Cars;
 	<header>
 		<h1>Bon de commande d'une voiture</h1>
 	</header>
-<form id="order_create" method="post" action="">
+<form id="order_read" method="post" action="">
 	<h3 class="alert alert-primary" role="alert">Bon de Commande de Votre Nouvelle Voiture !</h3>
 	<div class="alert alert-danger" role="alert">Les champs en rouge sont obligatoires !</div>
 	<fieldset class="form-group">
@@ -154,7 +154,7 @@ use mvcCore\Data\Cars;
 		</label>
 	</fieldset>
 	<div>
-		<input id="create" name="create" class="btn btn-primary" type="submit" value="Valider" /> <input id="persist" name="persist" class="btn btn-success" type="submit" value="Enregistrer" />
+		<input id="create" name="update" class="btn btn-primary" type="submit" value="Mettre à jour" />
 	</div>
 </form>
 	<footer>

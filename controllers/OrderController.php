@@ -1,7 +1,6 @@
 <?php
 namespace mvcCore\Controllers;
 
-use mvcCore\Etc\Config;
 use mvcCore\Data\Cars;
 use mvcCore\Views\View;
 
@@ -11,9 +10,6 @@ use mvcCore\Views\View;
  */
 
 class OrderController extends Controller {
-	
-	// Debug mode
-	const DEBUG = false;
 		
 	public function __construct( $model) {
 		$this->__model = $model;
@@ -50,27 +46,27 @@ class OrderController extends Controller {
 	//
 	// Get inputs and set model properties
 	// @Override
-	public function input() {
+	public function input( $method = INPUT_POST) {
 		// Only from POST data
 		if ( count( $_POST) > 0) {
 			// Get and set :
 			// Lastname, Firstname and Email
-			$this->__model->setLastname( filter_input( INPUT_POST, 'lastname', FILTER_SANITIZE_STRING));
-			$this->__model->setFirstname(filter_input( INPUT_POST, 'firstname', FILTER_SANITIZE_STRING));
-			$this->__model->setEmail( filter_input( INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
+			$this->__model->setLastname( filter_input( $method, 'lastname', FILTER_SANITIZE_STRING));
+			$this->__model->setFirstname(filter_input( $method, 'firstname', FILTER_SANITIZE_STRING));
+			$this->__model->setEmail( filter_input( $method, 'email', FILTER_SANITIZE_EMAIL));
 			// Brand and Model
-			$this->__model->setBrand( filter_input( INPUT_POST, 'brand', FILTER_SANITIZE_STRING));
-			$this->__model->setModel( filter_input( INPUT_POST, 'model', FILTER_SANITIZE_STRING));
+			$this->__model->setBrand( filter_input( $method, 'brand', FILTER_SANITIZE_STRING));
+			$this->__model->setModel( filter_input( $method, 'model', FILTER_SANITIZE_STRING));
 			// Selected gearbox (Radio button)
-			$this->__model->setGearbox( filter_input( INPUT_POST, 'gearbox', FILTER_SANITIZE_STRING));
+			$this->__model->setGearbox( filter_input( $method, 'gearbox', FILTER_SANITIZE_STRING));
 			// Selected color (Radio button)
-			$this->__model->setColor( filter_input( INPUT_POST, 'color', FILTER_SANITIZE_STRING));
+			$this->__model->setColor( filter_input( $method, 'color', FILTER_SANITIZE_STRING));
 			// Selected options (Checkbox)
-			$this->__model->setOptions( filter_input( INPUT_POST, 'options', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));
+			$this->__model->setOptions( filter_input( $method, 'options', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));
 			// Return price
-			$this->__model->setReturnPrice( filter_input( INPUT_POST, 'return_price', FILTER_SANITIZE_NUMBER_INT));
+			$this->__model->setReturnPrice( filter_input( $method, 'return_price', FILTER_SANITIZE_NUMBER_INT));
 			// Total price
-			$this->__model->setTotalPrice( filter_input( INPUT_POST, 'total_price', FILTER_SANITIZE_NUMBER_INT));
+			$this->__model->setTotalPrice( filter_input( $method, 'total_price', FILTER_SANITIZE_NUMBER_INT));
 		}
 		// Compute total price
 		$this->_total_price();
@@ -79,11 +75,110 @@ class OrderController extends Controller {
 	//
 	// Create new order
 	// @Override
-	public function create( $action = 'read') {
+	public function create( $method = INPUT_POST, $redirect = 'read') {
 		// Put Input POST form data into the model
-		$this->input();
+		$this->input( $method);
+
+		// Checl for a persist submit
+		$persit = filter_input( $method, 'persist', FILTER_SANITIZE_STRING);
+
+		if ( is_null( $persit)) {
+			// View instance ( model object, "create")
+			$view = View::factory( $this->__model, __FUNCTION__);
+	
+			// Display the view
+			$view->display();
+		} else {
+			// Persist action
+			$this->persist( $redirect);
+		}
+	}
+	
+	// Read an object
+	// @Override
+	public function read() {
+		// Get input id from $GLOBALS['request']
+		$id = $GLOBALS['request']['id'];
+		// Model Class
+		$class = get_class(  $this->__model);
+		// Get the model(s)
+		$models = $this->__dao->read( $class::$_model_table, $class, $id);
+		// View instance ( model object, "read")
+		if ( count( $models) == 1) { // Just one object
+			$this->__model = $models[0];
+			// Decrypt some fields
+			$this->__model->decrypt();
+		} elseif ( count( $models) > 1) { // More than one object ( i.e. use a template with a list layout)
+			$this->__model = $models;
+			// Decrypt some fields
+			for ($n = 0; $n < count( $models); $n++) {
+				$this->__model[$n]->decrypt();
+			}
+		}
 		
-		// View instance ( model object, "create")
+		// View instance ( model object, "read")
+		$view = View::factory( $this->__model, __FUNCTION__);
+		
+		// Display the view
+		$view->display();
+	}
+	
+	// Update an object
+	// @Override
+	public function update( $method = INPUT_POST, $redirect = 'read') {
+		// Get input id from $GLOBALS['request']
+		$id = $GLOBALS['request']['id'];
+		if ( ! empty( $id)) {
+			// Model Class
+			$class = get_class(  $this->__model);
+			// Get the object from the database
+			$models = $this->__dao->read( $class::$_model_table, $class, $id);
+			if ( count( $models) == 1) { // Just one object
+				$this->__model = $models[0];
+				// Decrypt some fields
+				$this->__model->decrypt();
+				
+				// Put POST data into the model
+				$this->input( $method);
+				
+				// Get data (not the null and the default ones)
+				$data = $this->__model->getProperties();
+				// Encrypt data
+				$data = $this->__model->encrypt( $data);
+				// Update the database object
+				$result = $this->__dao->update( $class::$_model_table, $data, $id);
+				// TODO / JMB : $result processing
+				// View instance ( model object, "update")
+				$view = View::factory( $this->__model, __FUNCTION__);
+			} else { // More than one object ( i.e. use a template with a list layout)
+				die( "No Order object to update with id : $id !");
+			}
+		} else {
+			throw new \UnexpectedValueException( "No Order object to update with an empty id !");
+		}
+		// Display the view
+		$view->display();
+	}
+	
+	// Delete an object
+	// @Override
+	public function delete( $redirect = '') {
+		// Get input id from $GLOBALS['request']
+		$id = $GLOBALS['request']['id'];
+		// Model Class
+		$class = get_class(  $this->__model);
+		// Get the model(s)
+		$models = $this->__dao->read( $class::$_model_table, $class, $id);
+		// View instance ( model object, "read")
+		if ( count( $models) == 1) { // Just one object
+			$this->__model = $models[0];
+			// Decrypt some fields
+			$this->__model->decrypt();
+		} elseif ( count( $models) > 1) { // More than one object ( i.e. use a template with a list layout)
+			throw new \UnexpectedValueException( "You can't delete more than one object !");
+		}
+		
+		// View instance ( model object, "read")
 		$view = View::factory( $this->__model, __FUNCTION__);
 		
 		// Display the view

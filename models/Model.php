@@ -75,7 +75,17 @@ abstract class Model {
 		$this->id = $id;
 	}
 
-
+	// Crypt
+	public function encrypt( $data = []) {
+		// To be defined
+		return $data;
+	}
+	
+	// Decrypt
+	public function decrypt( $data = []) {
+		// To be defined
+		return $data;
+	}
 }
 
 ?>
