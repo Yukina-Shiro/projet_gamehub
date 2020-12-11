@@ -1,5 +1,7 @@
 <?php
+
 namespace mvcCore\Helpers;
+
 /**
  * This file contains the Url class for manipulating URLs.
  *
@@ -8,11 +10,11 @@ namespace mvcCore\Helpers;
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.horde.org/licenses/lgpl21.
  *
- * @author   Jan Schneider <jan@horde.org>
- * @author   Michael Slusarz <slusarz@horde.org>
- * @license  http://www.horde.org/licenses/lgpl21 LGPL 2.1
+ * @author Jan Schneider <jan@horde.org>
+ * @author Michael Slusarz <slusarz@horde.org>
+ * @license http://www.horde.org/licenses/lgpl21 LGPL 2.1
  * @category Horde
- * @package  Url
+ * @package Url
  */
 
 /**
@@ -47,7 +49,7 @@ class Url {
 	 *
 	 * @var array
 	 */
-	public $parameters = array();
+	public $parameters = [];
 
 	/**
 	 * Whether to output the URL in the raw URL format or HTML-encoded.
@@ -156,17 +158,15 @@ class Url {
 	 * @return Url This (modified) object, to allow chaining.
 	 */
 	public function add( $parameters, $value = null) {
-		if ( !is_array( $parameters)) {
-			$parameters = array( 
-				$parameters => $value
-			);
+		if ( ! is_array( $parameters)) {
+			$parameters = [ $parameters => $value];
 		}
 
 		foreach ( $parameters as $parameter => $value) {
 			if ( substr( $parameter, -2) == '[]') {
 				$parameter = substr( $parameter, 0, -2);
 				if ( !isset( $this->parameters[$parameter])) {
-					$this->parameters[$parameter] = array();
+					$this->parameters[$parameter] = [];
 				}
 				$this->parameters[$parameter][] = $value;
 			} else {
@@ -189,10 +189,8 @@ class Url {
 	 * @return Url This (modified) object, to allow chaining.
 	 */
 	public function remove( $parameters) {
-		if ( !is_array( $parameters)) {
-			$parameters = array( 
-				$parameters
-			);
+		if ( is_array( $parameters)) {
+			$parameters = [ $parameters];
 		}
 
 		foreach ( $parameters as $parameter) {
@@ -367,12 +365,12 @@ class Url {
 	/**
 	 * Sends a redirect request to the browser to the URL in this object.
 	 *
-	 * @throws UnexpectedValueException
+	 * @throws \UnexpectedValueException
 	 */
 	public function redirect() {
 		$url = strval( $this->setRaw( true));
 		if ( !strlen( $url)) {
-			throw new UnexpectedValueException( 'Redirect failed: URL is empty.');
+			throw new \UnexpectedValueException( 'Redirect failed: URL is empty.');
 		}
 
 		header( 'Location: ' . $url);
@@ -388,15 +386,7 @@ class Url {
 	 * @return string URL-safe, base64 encoded data.
 	 */
 	public static function uriB64Encode( $string) {
-		return str_replace( array( 
-			'+',
-			'/',
-			'='
-		), array( 
-			'-',
-			'_',
-			''
-		), base64_encode( $string));
+		return str_replace( array( '+','/','='), array( '-','_',''), base64_encode( $string));
 	}
 
 	/**
@@ -408,13 +398,7 @@ class Url {
 	 * @return string Decoded data.
 	 */
 	public static function uriB64Decode( $string) {
-		$data = str_replace( array( 
-			'-',
-			'_'
-		), array( 
-			'+',
-			'/'
-		), $string);
+		$data = str_replace( array( '-','_'), array( '+','/'), $string);
 		$mod4 = strlen( $data) % 4;
 		if ( $mod4) {
 			$data .= substr( '====', $mod4);

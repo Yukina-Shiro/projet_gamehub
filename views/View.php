@@ -51,7 +51,6 @@ abstract class View {
 		}
 	}
 	
-	
 	// Set properties
 	abstract public function setProperties();
 
@@ -81,6 +80,9 @@ abstract class View {
 		$this->_data += $this->getProperties( false, false);
 		// Turn on output buffering
 		ob_start();
+		// Form action
+		$model = $GLOBALS['request']['model'];
+		$action = $GLOBALS['request']['action'];
 		// Define $data[]
 		$data = $this->_data;
 		// Load the template
@@ -90,4 +92,3 @@ abstract class View {
 	}
 }
 
-?>

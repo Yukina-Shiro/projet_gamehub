@@ -14,16 +14,16 @@ var order = {
 				element.addEventListener( 'change', ( event) => {
 					order.submit();
 				});
-				console.log(  ' - ' + element.id);
+				console.log( ' - ' + element.id);
 			});
 		}
 		// Set kind of « readonly » mode for #order_read and #order_delete
-		// To do that set disabled="disabled" for all fieldset elements
+		// To do that set attribute disabled="disabled" for all fieldset elements
 		let elements = document.querySelectorAll( '#order_read fieldset, #order_delete fieldset');
 		if ( ( elements !== undefined) && ( elements !== null) ) {
 			// Loop over the elements collection
 			Array.from( elements).forEach( function( e) {
-				// Submit the form on « change » event for all the elements
+				// Set attribute disabled="disabled" for this elements
 				e.setAttribute( 'disabled', 'disabled');
 			});
 		}

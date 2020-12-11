@@ -6,8 +6,8 @@ require 'header.tpl.php';
 ?>
 <body onload="<?= $model ?>.init()">
 	<header>
-		<h3 class="alert alert-success" role="alert">
-			Bon de Commande N° <?= $data['id'] ?>
+		<h3 class="alert alert-danger" role="alert">
+			Suppression du Bon de Commande N° <?= $data['id'] ?>
 		</h3>
 	</header>
 	<form id="order_<?= $action ?>" method="post" action="<?= $_SERVER['REQUEST_URI'] ?>">
@@ -19,10 +19,11 @@ require 'Order.tpl.php';
 ?>
 	<!--  Form action buttons - Begin -->
 	<div>
-		<input id="update" name="update" class="btn btn-primary" type="submit" value="Mettre à jour" />
 		<input id="delete" name="delete" class="btn btn-danger" type="submit" value="Supprimer" />
+		<input id="create" name="create" class="btn btn-primary" type="submit" value="Nouveau" />
 	</div>
 	<!--  Form action buttons - End -->
 <?php
+
 // Common HTML footer
 require 'footer.tpl.php';

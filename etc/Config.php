@@ -8,6 +8,9 @@ class Config {
 	
 	// Verbose mode
 	const  VERBOSE = false;
+	
+	// Session Name
+	const SESSION_NAME = 'MVCCORE';
 
 	// XHTML flag
 	const XHTML = true;
@@ -41,4 +44,3 @@ class Config {
 
 // Init call
 Config::init();
-?>

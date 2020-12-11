@@ -63,6 +63,31 @@ class OrderModel extends Model {
 		return $properties_names;
 	}
 
+	// Encrypts the properties that must be
+	// To be used in getProperties() method below
+	public function encrypt( $data = []) {
+		if ( isset( $data['firstname']))
+			$data['firstname'] =  self::$__crypt->encrypt( $data['firstname']);
+		if ( isset( $data['firstname']))
+			$data['lastname'] =  self::$__crypt->encrypt( $data['lastname']);
+		if ( isset( $data['email']))
+			$data['email'] =  self::$__crypt->encrypt( $data['email']);
+		if ( self::DEBUG) var_dump( $data);
+		return $data;
+	}
+	
+	// Decrypts the properties that must be
+	// To be used in the read() method below
+	public function decrypt() {
+		$this->firstname = self::$__crypt->decrypt( $this->firstname);
+		$this->lastname = self::$__crypt->decrypt( $this->lastname);
+		$this->email = self::$__crypt->decrypt( $this->email);
+		// Remove \" from json options field
+		$this->options = str_replace( "\\", "", $this->options);
+		// Remove " at the beginning and the end of options field
+		$this->options = trim( $this->options, '"');
+		if ( self::DEBUG) var_dump( $this->firstname, $this->lastname, $this->email);
+	}
 	
 	/**
 	 * @return string
@@ -245,4 +270,3 @@ class OrderModel extends Model {
 	
 }
 
-?>

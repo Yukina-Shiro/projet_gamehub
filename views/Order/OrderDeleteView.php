@@ -1,7 +1,7 @@
 <?php
 namespace mvcCore\Views;
 
-class OrderReadView extends View {
+class OrderDeleteView extends View {
 	
 	use OrderView;
 	

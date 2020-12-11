@@ -72,6 +72,12 @@ class OrderController extends Controller {
 		$this->_total_price();
 	}
 	
+	/**
+	 * =============================================
+	 * Move all the following methods to the abstract Controler class
+	 * =============================================
+	 */
+	
 	//
 	// Create new order
 	// @Override
@@ -93,10 +99,11 @@ class OrderController extends Controller {
 			$this->persist( $redirect);
 		}
 	}
+
 	
 	// Read an object
 	// @Override
-	public function read() {
+	public function read( $method = INPUT_POST, $redirect = 'update') {
 		// Get input id from $GLOBALS['request']
 		$id = $GLOBALS['request']['id'];
 		// Model Class
@@ -115,12 +122,25 @@ class OrderController extends Controller {
 				$this->__model[$n]->decrypt();
 			}
 		}
+		// Check for a update submit
+		$update = filter_input( $method, 'update', FILTER_SANITIZE_STRING);
+		// Check for a delete submit
+		$delete = filter_input( $method, 'delete', FILTER_SANITIZE_STRING);
 		
-		// View instance ( model object, "read")
-		$view = View::factory( $this->__model, __FUNCTION__);
-		
-		// Display the view
-		$view->display();
+		if ( is_null( $update) && is_null( $delete)) {
+			// View instance ( model object, "create")
+			$view = View::factory( $this->__model, __FUNCTION__);
+			// Display the view
+			$view->display();
+		} else {
+			if ( is_null( $delete)) {
+				// Update action (default redirection)
+				$this->redirect( [ 'action' => $redirect]);
+			} else {
+				// Delete action
+				$this->redirect( [ 'action' => 'delete']);
+			}
+		}
 	}
 	
 	// Update an object
@@ -147,22 +167,32 @@ class OrderController extends Controller {
 				$data = $this->__model->encrypt( $data);
 				// Update the database object
 				$result = $this->__dao->update( $class::$_model_table, $data, $id);
-				// TODO / JMB : $result processing
+				// TODO / JMB : $result error processing
 				// View instance ( model object, "update")
-				$view = View::factory( $this->__model, __FUNCTION__);
+
+				// Check for a update submit
+				$update = filter_input( $method, 'update', FILTER_SANITIZE_STRING);
+				
+				if ( is_null( $update)) {
+					// View instance ( model object, "update")
+					$view = View::factory( $this->__model, __FUNCTION__);
+					// Display the view
+					$view->display();
+				} else {
+					// Update action
+					$this->redirect( [ 'action' => $redirect]);
+				}
 			} else { // More than one object ( i.e. use a template with a list layout)
-				die( "No Order object to update with id : $id !");
+				throw new \UnexpectedValueException( "No Order object to update with id : $id !");
 			}
 		} else {
 			throw new \UnexpectedValueException( "No Order object to update with an empty id !");
 		}
-		// Display the view
-		$view->display();
 	}
 	
 	// Delete an object
 	// @Override
-	public function delete( $redirect = '') {
+	public function delete( $method = INPUT_POST, $redirect = 'create') {
 		// Get input id from $GLOBALS['request']
 		$id = $GLOBALS['request']['id'];
 		// Model Class
@@ -178,14 +208,31 @@ class OrderController extends Controller {
 			throw new \UnexpectedValueException( "You can't delete more than one object !");
 		}
 		
-		// View instance ( model object, "read")
-		$view = View::factory( $this->__model, __FUNCTION__);
+		// Check for a delete submit
+		$delete = filter_input( $method, 'delete', FILTER_SANITIZE_STRING);
+
+		// Check for a read submit
+		$create = filter_input( $method, 'create', FILTER_SANITIZE_STRING);
 		
-		// Display the view
-		$view->display();
+		if ( is_null( $create) && is_null( $delete)) {
+			// View instance ( model object, "create")
+			$view = View::factory( $this->__model, __FUNCTION__);
+			// Display the view
+			$view->display();
+		} else {
+			if ( is_null( $delete)) {
+				// Create action (default redirection)
+				$this->redirect( [ 'action' => $redirect, 'id' => '']);
+			} else {
+				try {
+				// Delete action
+				$this->remove( $redirect);
+				} catch ( \PDOException $e) {
+					throw new \UnexpectedValueException( $e->getMessage());
+				}
+			}
+		}
+		
 	}
 	
 }
-
-?>
-

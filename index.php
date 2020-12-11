@@ -1,6 +1,4 @@
 <?php
-// Start a session
-session_start();
 
 // Autoloader
 require __DIR__ . '/vendor/autoload.php';
@@ -8,6 +6,12 @@ require __DIR__ . '/vendor/autoload.php';
 use mvcCore\Etc\Config;
 use mvcCore\Models\Model;
 use mvcCore\Controllers\Controller;
+
+// Get session name
+session_name( Config::SESSION_NAME);
+
+// Start a session
+session_start( );
 
 // Set debug mode
 if ( Config::DEBUG) {
@@ -87,4 +91,3 @@ if ( ! empty( $model_name) && ! empty( $model_action)) {
 		die( "Action $model_action does not exists !");
 } else
 	die( "« Eh, what's up, doc ? »");
-?>

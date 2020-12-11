@@ -13,7 +13,7 @@ use mvcCore\Views\View;
 abstract class Controller {
 
 	// Debug mode
-	const DEBUG = true;
+	const DEBUG = false;
 	
 	// Orders Model object
 	protected $__model;
@@ -25,9 +25,7 @@ abstract class Controller {
 		// DAO service instance
 		$this->__dao = new DAO( Config::DBTYPE,Config::DBHOST, Config::DBPORT, Config::DBNAME, Config::DBUSER, Config::DBPASSWD);
 	}
-	
-	//
-	//
+
 	//
 	public static function factory( $model) {
 		// "order" => "Order" => "OrderController"
@@ -67,7 +65,7 @@ abstract class Controller {
 	
 	// Read
 	// @Override
-	public abstract function read();
+	public abstract function read( $method = INPUT_POST, $redirect = 'update');
 	
 	// Update
 	// @Override
@@ -75,11 +73,11 @@ abstract class Controller {
 	
 	// Delete
 	// @Override
-	public abstract function delete( $redirect = '');
+	public abstract function delete( $method = INPUT_POST, $redirect = 'create');
 
 	
 	//
-	// Display action
+	// Display action for basic HTML template display
 	//
 	public function display() {
 		$view = View::factory( $this->model, __FUNCTION__);
@@ -90,7 +88,7 @@ abstract class Controller {
 	//
 	// Redirect URL
 	//
-	public static function redirect( $params = array(), $anchor = '') {
+	public static function redirect( $params = [], $anchor = '') {
 		// Define the protocol
 		$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 		// Define the full current URL
@@ -98,15 +96,40 @@ abstract class Controller {
 		// Url object instance
 		$url = new Url( $url);
 		// Add or update the URL parameters
-		foreach ( $GLOBALS['request'] as $param => $value) {
-			if ( isset( $params[$param]) && ! empty( $params[$param]))
-				$url->add( $param, $params[$param]);
+		foreach ( array_keys( $GLOBALS['request']) as $param) {
+			if ( isset( $params[$param])) {
+				if ( ! empty( $params[$param])) {
+					$url->add( $param, $params[$param]);
+				} else {
+					$url->remove( $param);
+				}
+			}
 		}
-		if ( self::DEBUG) var_dump ( $url->toString());
 		// Set the new anchor and redirect
 		$url->setAnchor( $anchor)->redirect();
 	}
 
+	/**
+	 * ===========================================
+	 * Move the following method to the mvcCore\DAO\DAO class
+	 * with the object as function parameter
+	 * ===========================================
+	 */
+	
+	//
+	// find object(s) in de data backend (e.g SQL database)
+	//
+	public function find( int $id = null) : array {
+		
+	}
+	
+	//
+	// merge an object in de data backend (e.g SQL database)
+	//
+	public function merge( int $id) {
+		
+	}
+	
 	//
 	// Persist an object in de data backend (e.g SQL database)
 	//
@@ -133,18 +156,19 @@ abstract class Controller {
 	//
 	// Remove an object from the data backend (e.g SQL database)
 	//
-	public function remove( $redirect = '') {
+	public function remove( $redirect = 'create') {
 		// Get input id from $GLOBALS['request']
 		$id = $GLOBALS['request']['id'];
 		// Delete the object with the current id
-		$model_class = $this->__model::$class_name;
+		$model_class = get_class( $this->__model);
 		$result = $this->__dao->delete( $model_class::$_model_table, $id);
 		if ( empty( $result)) {
 			// Display an error !
-			die( "An error has occured !");
+			die( 'An error has occured in ' . __FILE__ . ' , for ' . __FUNCTION__ . '() function, at line ' . __LINE__);
 		} else { // Redirect to the home page
-			$this->redirect( array( 'action' => $redirect, 'model' => $model_class));
+			$this->redirect( [ 'action' => $redirect, 'id' => '']);
 		}
 	}
+	
 }
-?>
+

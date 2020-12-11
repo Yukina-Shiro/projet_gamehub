@@ -79,12 +79,14 @@ _EOS_;
 		$id = null;
 		try {
 			// Start transaction
-			if( $begin_transaction)
-				self::$pdo->beginTransaction();
-				// Prepare and execute insert
-				self::$pdo->prepare( $sql)->execute( $data);
-				$id = self::$pdo->lastInsertId();
-				self::$pdo->commit();
+			if( $begin_transaction) self::$pdo->beginTransaction();
+			// Prepare and execute insert
+			$pst = self::$pdo->prepare( $sql);
+			$pst->execute( $data);
+			// Commit transaction
+			if ( $begin_transaction) self::$pdo->commit();
+			// Get the result
+			$id = self::$pdo->lastInsertId();
 		} catch( \PDOException $e) {
 			// Rollback on error
 			if ( self::$pdo->inTransaction())
@@ -166,11 +168,14 @@ _EOS_;
 		$result = false;
 		try {
 			// Start transaction
-			if ( $begin_transaction)
-				self::$pdo->beginTransaction();
-				// Prepare and execute update
-				$pst = self::$pdo->prepare( $sql)->execute( $data);
-				$result = ( $pst->rowCount() == 1) ? true : false;
+			if ( $begin_transaction) self::$pdo->beginTransaction();
+			// Prepare and execute update
+			$pst = self::$pdo->prepare( $sql);
+			$pst->execute( $data);
+			// Commit transaction
+			if ( $begin_transaction) self::$pdo->commit();
+			// Get the result
+			$result = ( $pst->rowCount() == 1) ? true : false;
 		} catch( \PDOException $e) {
 			// Rollback on error
 			if ( self::$pdo->beginTransaction())
@@ -196,17 +201,20 @@ DELETE
 	FROM $table_name
 	WHERE id = :id;
 _EOS_;
-		$data = array( ':id' => $id);
-		if ( self::DEBUG) var_dump( 'DELETE =>', $sql);
+		$data = array( 'id' => $id);
+		if ( self::DEBUG) var_dump( 'DELETE =>', $sql, $data);
 		// Prepare and execute statement
 		$result = false;
 		try {
 			// Start transaction
-			if ( $begin_transaction)
-				self::$pdo->beginTransaction();
-				// Prepare and execute delete
-				$pst = self::$pdo->prepare( $sql)->execute( $data);
-				$result = ( $pst->rowCount() == 1) ? true : false;
+			if ( $begin_transaction) self::$pdo->beginTransaction();
+			// Prepare and execute delete
+			$pst = self::$pdo->prepare( $sql);
+			$pst->execute( $data);
+			// Commit transaction
+			if ( $begin_transaction) self::$pdo->commit();
+			// Get the result
+			$result = ( $pst->rowCount() == 1) ? true : false;
 		} catch( \PDOException $e) {
 			// Roolback on error
 			if ( self::$pdo->inTransaction())
@@ -223,4 +231,3 @@ _EOS_;
 	
 }
 
-?>

@@ -1,6 +1,8 @@
 <?php
 namespace mvcCore\Models;
 
+use mvcCore\Helpers\Crypt;
+
 /*
  * @author : Jean-Michel Bruneau
  * @version : 1.0
@@ -9,11 +11,17 @@ namespace mvcCore\Models;
 // Model Factory
 abstract class Model {
 	
+	// Crypt Object instance
+	public static  $__crypt= null;
+	
 	// @Id
 	protected ?string $id = null;
 
 	// Constructor
 	public function __construct( $data = null) {
+		// Get a Crypt instance
+		self::$__crypt = new Crypt();
+		// Populate properties with $data[]
 		if ( ! is_null( $data)) {
 			$properties = get_object_vars( $this);
 			foreach ( $properties as $property => $value) {
@@ -41,6 +49,8 @@ abstract class Model {
 	// Get properties
 	public function getProperties( $empty = true, $default = true) {
 		$properties = get_object_vars( $this);
+		// Unset the Crypt object
+		unset( $properties['__crypt']);
 		if ( $empty) { // Remove empty values
 			foreach ( $properties as $key => $value) {
 				if ( empty( $value)) unset( $properties[$key]);
@@ -60,7 +70,13 @@ abstract class Model {
 		}
 		return $properties_names;
 	}
-
+	
+	// Crypt
+	abstract public function encrypt( $data = []);
+	
+	// Decrypt
+	abstract public function decrypt();
+	
 	/**
 	 * @return mixed
 	 */
@@ -75,17 +91,4 @@ abstract class Model {
 		$this->id = $id;
 	}
 
-	// Crypt
-	public function encrypt( $data = []) {
-		// To be defined
-		return $data;
-	}
-	
-	// Decrypt
-	public function decrypt( $data = []) {
-		// To be defined
-		return $data;
-	}
 }
-
-?>
