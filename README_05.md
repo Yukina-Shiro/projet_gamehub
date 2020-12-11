@@ -4,7 +4,7 @@
 ```
 $ rsync -auv mvc-core_04/ mvc-core_05/
 $ cd mvc-core_05/
-$ git commit -a -m 'version 04'
+$ git commit -a -m 'version 05'
 ```
 ## Mode développement et production
 

@@ -189,7 +189,7 @@ class Url {
 	 * @return Url This (modified) object, to allow chaining.
 	 */
 	public function remove( $parameters) {
-		if ( is_array( $parameters)) {
+		if ( ! is_array( $parameters)) {
 			$parameters = [ $parameters];
 		}
 

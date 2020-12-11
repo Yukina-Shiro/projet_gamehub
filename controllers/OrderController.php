@@ -10,7 +10,7 @@ use mvcCore\Views\View;
  */
 
 class OrderController extends Controller {
-		
+	
 	public function __construct( $model) {
 		$this->__model = $model;
 		parent::__construct();

@@ -26,7 +26,7 @@ abstract class Controller {
 		$this->__dao = new DAO( Config::DBTYPE,Config::DBHOST, Config::DBPORT, Config::DBNAME, Config::DBUSER, Config::DBPASSWD);
 	}
 
-	//
+	// Controler's Factory
 	public static function factory( $model) {
 		// "order" => "Order" => "OrderController"
 		$class_name = ucwords( $model->getModelName()) . 'Controller';
