@@ -31,10 +31,10 @@
 						-->
 						<li class="nav-item active"><a class="nav-link" href="index.php">Home</a></li>
 						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=create">Create Order</a></li>
-						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=read&id=13">Display ( read) Order</a></li>
+						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=read&id=13">Display Order</a></li>
+						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=read">Display All Order</a></li>
 						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=update&id=18">Update Order</a></li>
-						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=delete&id=6">Delete Order</a></li>
-						<li class="nav-item"><a class="nav-link disabled" href="#">Disabled</a></li>
+						<li class="nav-item"><a class="nav-link disabled" href="index.php?model=order&action=delete&id=6">Delete Order</a></li>
 					</ul>
 				</div>
 			</nav>
