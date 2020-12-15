@@ -34,11 +34,11 @@
 				<td><?= $data[$n]['total_price'] ?></td>
 				<td scope="row">
 					<!-- Display -->
-					<a href="index.php?model=<?= $model ?>&action=read&service=1&id=<?= $data[$n]['id'] ?>" class="btn btn-success ls-modal">Display</a>
+					<a href="index.php?model=<?= $model ?>&action=read&id=<?= $data[$n]['id'] ?>" class="btn btn-success ls-modal">Display</a>
 					 <!-- Update -->
-					<a href="index.php?model=<?= $model ?>&action=update&service=1&id=<?= $data[$n]['id'] ?>" class="btn btn-primary ls-modal">Update</a>
+					<a href="index.php?model=<?= $model ?>&action=update&id=<?= $data[$n]['id'] ?>" class="btn btn-primary ls-modal">Update</a>
 					 <!-- Delete -->
-					<a href="index.php?model=<?= $model ?>&action=delete&service=1&id=<?= $data[$n]['id'] ?>" class="btn btn-danger ls-modal">Delete</a>
+					<a href="index.php?model=<?= $model ?>&action=delete&id=<?= $data[$n]['id'] ?>" class="btn btn-danger ls-modal">Delete</a>
 				</td>
 			</tr>
 			<?php } ?>
