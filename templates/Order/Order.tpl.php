@@ -2,6 +2,7 @@
 namespace mvcCore\Views\Templates;
 
 use mvcCore\Data\Cars;
+
 ?>
 	<fieldset class="form-group">
 		<legend>Informations personnelles : </legend>

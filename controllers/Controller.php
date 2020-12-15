@@ -6,7 +6,6 @@ use mvcCore\Dao\DAO;
 use mvcCore\Helpers\Url;
 use mvcCore\Views\View;
 
-
 //
 // Controller Factory
 //
@@ -38,17 +37,6 @@ abstract class Controller {
 		} else {
 			throw new \InvalidArgumentException( "Class $class not found !");
 		}
-	}
-	
-	// Get all the view properties
-	public function getProperties() {
-		// View properties
-		$properties = get_object_vars( $this);
-		// Unset the DAO and the Model object
-		unset( $properties['__dao'], $properties['__model']);
-		// Merge with Model properties
-		if ( Config::VERBOSE) var_dump( $properties, $this->__model->getProperties());
-		return array_merge( $properties, $this->__model->getProperties());
 	}
 	
 	// Get inputs and set model properties

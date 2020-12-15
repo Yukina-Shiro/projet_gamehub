@@ -1,10 +1,3 @@
-<?php
-
-// Common HTML header
-require 'header.tpl.php';
-
-?>
-<body onload="<?= $model ?>.init()">
 	<header>
 		<h3 class="alert alert-warning" role="alert">
 			Mise à Jour de la Commande N° <?= $data['id'] ?>
@@ -23,6 +16,3 @@ require 'Order.tpl.php';
 		<input id="update" name="update" class="btn btn-primary" type="submit" value="Mettre à jour" />
 	</div>
 	<!--  Form action buttons - End -->
-<?php
-// Common HTML footer
-require 'footer.tpl.php';

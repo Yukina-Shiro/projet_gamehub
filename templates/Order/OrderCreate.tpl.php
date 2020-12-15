@@ -1,15 +1,9 @@
-<?php
-
-// Common HTML header
-require 'header.tpl.php';
-
-?>
-<body onload="<?= $model ?>.init()">
 	<header>
 		<h3 class="alert alert-primary" role="alert">
 			Bon de Commande de Votre Nouvelle Voiture !
 		</h3>
-		<div class="alert alert-danger" role="alert">Les champs en rouge sont obligatoires !</div>
+	</header>
+	<div class="alert alert-danger" role="alert">Les champs en rouge sont obligatoires !</div>
 	</header>
 	<form id="order_<?= $action ?>" method="post" action="<?= $_SERVER['REQUEST_URI'] ?>">
 <?php
@@ -25,7 +19,3 @@ require 'Order.tpl.php';
 	<input id="persist" name="persist" class="btn btn-success" type="submit" value="Enregistrer" />
 	</div>
 	<!--  Form action buttons - End -->
-<?php
-
-// Common HTML footer
-require 'footer.tpl.php';

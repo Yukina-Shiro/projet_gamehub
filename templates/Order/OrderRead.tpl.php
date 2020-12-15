@@ -1,10 +1,3 @@
-<?php
-
-// Common HTML header
-require 'header.tpl.php';
-
-?>
-<body onload="<?= $model ?>.init()">
 	<header>
 		<h3 class="alert alert-success" role="alert">
 			Bon de Commande N° <?= $data['id'] ?>
@@ -23,6 +16,3 @@ require 'Order.tpl.php';
 		<input id="delete" name="delete" class="btn btn-danger" type="submit" value="Supprimer" />
 	</div>
 	<!--  Form action buttons - End -->
-<?php
-// Common HTML footer
-require 'footer.tpl.php';

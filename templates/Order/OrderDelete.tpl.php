@@ -1,10 +1,3 @@
-<?php
-
-// Common HTML header
-require 'header.tpl.php';
-
-?>
-<body onload="<?= $model ?>.init()">
 	<header>
 		<h3 class="alert alert-danger" role="alert">
 			Suppression du Bon de Commande N° <?= $data['id'] ?>
@@ -23,7 +16,4 @@ require 'Order.tpl.php';
 		<input id="create" name="create" class="btn btn-primary" type="submit" value="Nouveau" />
 	</div>
 	<!--  Form action buttons - End -->
-<?php
-
-// Common HTML footer
-require 'footer.tpl.php';
+	

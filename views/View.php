@@ -1,5 +1,7 @@
 <?php
 namespace mvcCore\Views;
+
+use mvcCore\Templates\Template;
 //
 // View Factory
 //
@@ -7,16 +9,16 @@ namespace mvcCore\Views;
 abstract class View {
 	
 	// Model object(s)
-	protected $_model = null;
+	protected $__model = null;
 	
-	// Template
-	protected $_tpl_filename = null;
+	// Is $this->__model is an array of object (list view)
+	protected $_array = false;
+	
+	// Template object
+	protected $__template = null;
 
 	// Data array()
 	protected $_data = null;
-	
-	// Template base directory
-	public static $tpl_dir = __DIR__ . '/templates/';
 	
 	// template suffix
 	public static $tpl_filename_suffix = '.tpl.php';
@@ -24,26 +26,31 @@ abstract class View {
 	// Constructor
 	public function __construct( $model, $template) {
 		// Set Model
-		$this->_model = $model;
+		$this->__model = $model;
+		// Is $model an array of object ?
+		if ( is_array( $model)) $this->_array = true;
 		// Set Template
-		$this->_tpl_filename = $template;
+		$this->__template = $template;
 		// Set view specific's properties
 		$this->setProperties();
 	}
 	
 	// Factory
 	public static function factory( $model, $action) {
-		$model_name = $model->getModelName();
+		$model_name =  ( is_array( $model)) ? $model[0]->getModelName() : $model->getModelName() ;
 		// "order" -> "Order", "create" -> "Create" => "OrderCreateView"
 		$class_prefix =  ucwords( $model_name) . ucwords( $action);
 		$class_name = $class_prefix . "View";
 		// Class name with namespace
 		$class = '\\' . __NAMESPACE__ . '\\' . $class_name;
 		if ( class_exists( $class)) {
-			// Set template file name
-			$tpl_filename = self::$tpl_dir . $class_prefix . self::$tpl_filename_suffix;
+			// Template instance
+			if ( is_array( $model) && empty($GLOBALS['request']['layout'])) { // List layout forced
+				$GLOBALS['request']['layout'] = 'list';
+			}
+			$template = new Template( $model, $action);
 			// View instance
-			$object = new $class( $model, $tpl_filename);
+			$object = new $class( $model, $template);
 			// Object return
 			return $object;
 		} else {
@@ -59,7 +66,7 @@ abstract class View {
 		$properties = get_object_vars( $this);
 		// Remove the abstract view entries
 		if ( $abstract)
-			unset( $properties['_model'], $properties['_data'], $properties['_tpl_filename']);
+			unset( $properties['__model'], $properties['_array'], $properties['_data'], $properties['__template']);
 			// Remove null values
 			if ( $null)
 				foreach ( $properties as $key => $value)
@@ -74,20 +81,50 @@ abstract class View {
 	
 	// Fetch template
 	public function fetch() {
-		// Put model data into $this->_data array()
-		$this->_data = $this->_model->getProperties( false, false);
-		// Add data view to $this->data
-		$this->_data += $this->getProperties( false, false);
-		// Turn on output buffering
-		ob_start();
+			// Put model data into $this->data['model']
+		if ( ! $this->_array) { // Not a list layout
+			// Put model data into $this->_data array()
+			$this->_data = $this->__model->getProperties( false, false);
+			// Add data view to $this->_data
+			$this->_data += $this->getProperties( false, false);
+		} else { // With a list layout
+			for ( $n = 0; $n < count( $this->__model); $n++) {
+				// Put model data into $this->_data array()
+				$this->_data[$n] = $this->__model[$n]->getProperties( false, false);
+				// Add data view to $this->_data
+				$this->_data[$n] += $this->getProperties( false, false);
+			}
+		}
+
 		// Form action
 		$model = $GLOBALS['request']['model'];
 		$action = $GLOBALS['request']['action'];
+		
 		// Define $data[]
 		$data = $this->_data;
-		// Load the template
-		require $this->_tpl_filename;
-		// Return the template content
+		
+		// Turn on output buffering
+		ob_start();
+
+		// Header common template with no service
+		if ( empty( $GLOBALS['request']['service'])) {
+			if ( ! is_null( $this->__template->getCommonHeader())) require_once $this->__template->getCommonHeader();
+
+			// Header model template
+			if ( ! is_null( $this->__template->getHeader())) require_once $this->__template->getHeader();
+		}
+
+		// Body model template
+		if ( ! is_null( $this->__template->getFilename())) require_once $this->__template->getFilename();
+
+		// Footer template with no service
+		if ( empty( $GLOBALS['request']['service'])) {
+			if ( ! is_null( $this->__template->getFooter())) require_once $this->__template->getFooter();
+
+			// Footer common template with no service
+			if ( ! is_null( $this->__template->getCommonFooter())) require_once $this->__template->getCommonFooter();
+		}
+
 		return ob_get_clean();
 	}
 }
