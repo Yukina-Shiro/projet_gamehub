@@ -9,5 +9,8 @@ $ git commit -a -m 'version 05'
 ## Mode développement et production
 
 > Création de 2 fichiers de configurations spécifiques :
-> 1) Config.dev.php
-> 2) Config.prod.php
+* Config.dev.php
+* Config.prod.php
+
+## Mise en place d'une classe « Template »
+L'objectif est de 
