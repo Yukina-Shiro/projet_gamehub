@@ -22,7 +22,7 @@ var order = {
 				console.log( ' - ' + element.id);
 			});
 		}
-		// Set kind of « readonly » mode for #order_read and #order_delete
+		// Set a kind of « readonly » mode for #order_read and #order_delete
 		// To do that set attribute disabled="disabled" for all fieldset elements
 		let elements = document.querySelectorAll( '#order_read fieldset, #order_delete fieldset');
 		if ( ( elements !== undefined) && ( elements !== null) ) {

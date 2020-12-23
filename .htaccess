@@ -7,9 +7,9 @@
 RewriteEngine On
 
 # API Rest
-RewriteCond %{REQUEST_METHOD} (DELETE|GET|POST|PUT) [NC]
-RewriteRule ^.*/api/rest/([[:alpha:]]+)$ api/rest/index.php?model=$1&action=%{REQUEST_METHOD} [QSA,L]
-RewriteRule ^.*/api/rest/([[:alpha:]]+)/([[:digit:]]+)$ api/rest/index.php?model=$1&action=%{REQUEST_METHOD}&id=$2 [QSA,L]
+#RewriteCond %{REQUEST_METHOD} (DELETE|GET|POST|PUT) [NC]
+#RewriteRule ^.*/api/rest/([[:alpha:]]+)$ api/rest/index.php?model=$1&action=%{REQUEST_METHOD} [QSA,L]
+#RewriteRule ^.*/api/rest/([[:alpha:]]+)/([[:digit:]]+)$ api/rest/index.php?model=$1&action=%{REQUEST_METHOD}&id=$2 [QSA,L]
 
 # Default entry
 RewriteCond %{REQUEST_FILENAME} -s [OR]
