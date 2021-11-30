@@ -1,5 +1,5 @@
 // Javascript for Order object
-var order = {
+const order = {
 	// Add and event listener when the DOM is loaded
 	init : function() {
 		document.addEventListener( 'DOMContentLoaded', this.ready, false);
@@ -16,7 +16,7 @@ var order = {
 			// Loop over the collection elements
 			Array.from( collection).forEach( function( element) {
 				// Submit the form on « change » event for all the elements
-				element.addEventListener( 'change', ( event) => {
+				element.addEventListener( 'change', () => {
 					order.submit();
 				});
 				console.log( ' - ' + element.id);

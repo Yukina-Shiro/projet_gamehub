@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="description" content="Car Whorkshop Form Order">
-		<meta name="author" content="Jean-Michel Bruneau">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		<meta name="description" content="Car Whorkshop Form Order" />
+		<meta name="author" content="Jean-Michel Bruneau" />
 		<title>My Car Worshop</title>
 		<!-- bootstrap css -->
-		<link href="css/bootstrap.css" rel="stylesheet">
+		<link href="css/bootstrap.css" rel="stylesheet" />
 		<!-- global css go here -->
-		<link href="css/index.css" rel="stylesheet">
+		<link href="css/index.css" rel="stylesheet" />
 		<!-- bootstrap scripts -->
 		<script defer="defer" src="js/jquery.js"></script>
 		<script defer="defer" src="js/bootstrap.js"></script>
@@ -31,9 +31,9 @@
 						-->
 						<li class="nav-item active"><a class="nav-link" href="index.php">Home</a></li>
 						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=create">Create Order</a></li>
-						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=read&id=13">Display Order</a></li>
+						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=read&id=1">Display Order</a></li>
 						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=read">Display All Order</a></li>
-						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=update&id=18">Update Order</a></li>
+						<li class="nav-item"><a class="nav-link" href="index.php?model=order&action=update&id=2">Update Order</a></li>
 						<li class="nav-item"><a class="nav-link disabled" href="index.php?model=order&action=delete&id=6">Delete Order</a></li>
 					</ul>
 				</div>

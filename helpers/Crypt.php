@@ -69,7 +69,7 @@ class Crypt {
 		if ( ! empty( $iv)) {
 			$decrypt_data = openssl_decrypt( $data, $this->cipher_method, self::KEY, 0, base64_decode( $iv));
 		} else {
-			throw new UnexpectedValueException( "Empty initialization vector !");
+			throw new \UnexpectedValueException( "Empty initialization vector !");
 		}
 		return $decrypt_data;
 	}
