@@ -68,7 +68,7 @@ abstract class Controller {
 	// Display action for basic HTML template display
 	//
 	public function display() {
-		$view = View::factory( $this->model, __FUNCTION__);
+		$view = View::factory( $this->__model, __FUNCTION__);
 		// Display the view
 		$view->display();
 	}
@@ -108,7 +108,7 @@ abstract class Controller {
 	// find object(s) in de data backend (e.g SQL database)
 	//
 	public function find( int $id = null) : array {
-		
+    	return []; // On retourne un tableau vide pour calmer PHP
 	}
 	
 	//

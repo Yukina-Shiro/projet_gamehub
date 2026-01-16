@@ -1,1 +1,9 @@
-/vendor/
+/vendor
+/node_modules
+.env
+.DS_Store
+*.log
+
+.idea
+.vscode
+Thumbs.db
