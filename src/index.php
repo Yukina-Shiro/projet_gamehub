@@ -19,7 +19,7 @@ if (file_exists($controllerFile)) {
     if (class_exists($controllerName)) {
         $controller = new $controllerName($pdo);
         if (method_exists($controller, $actionName)) {
-            $controller->$actionName();
+            $controller->   $actionName();
         } else {
             echo "Erreur 404 : L'action $actionName n'existe pas.";
         }
