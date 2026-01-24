@@ -6,19 +6,19 @@ class PostModel extends Model {
     public function getFeed($myId) {
         $sql = "
             SELECT p.*, u.pseudo, u.photo_profil,
-            (SELECT SUM(vote) FROM Vote WHERE id_post = p.id_post) as score
-            FROM Post p
-            JOIN Utilisateur u ON p.id_utilisateur = u.id_utilisateur
+            (SELECT SUM(vote) FROM vote WHERE id_post = p.id_post) as score
+            FROM post p
+            JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
             WHERE 
                 p.id_utilisateur = ? 
                 OR p.id_utilisateur IN (
-                    SELECT sender_id FROM Amis WHERE receiver_id = ? AND statut = 'valide'
+                    SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
                     UNION
-                    SELECT receiver_id FROM Amis WHERE sender_id = ? AND statut = 'valide'
+                    SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
                 )
                 OR (
                     p.statut = 'public' 
-                    AND p.id_utilisateur IN (SELECT id_suivi FROM Follow WHERE id_suiveur = ?)
+                    AND p.id_utilisateur IN (SELECT suivi FROM relation WHERE suiveur = ?)
                 )
             ORDER BY p.date_creation DESC LIMIT 20";
         

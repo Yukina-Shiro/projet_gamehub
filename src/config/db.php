@@ -1,9 +1,9 @@
 <?php
 // config/db.php
-define('DB_HOST', 'linserv-info-01');
+define('DB_HOST', 'localhost');
 define('DB_NAME', 'gj402456_game_hub');
-define('DB_USER', 'gj402456'); 
-define('DB_PASS', 'gj402456'); 
+define('DB_USER', 'root'); 
+define('DB_PASS', ''); 
 
 try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8", DB_USER, DB_PASS);

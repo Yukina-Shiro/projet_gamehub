@@ -6,14 +6,14 @@ class AuthController extends Controller {
 
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            $mdp = $_POST['mdp'];
-            
+            $email = $_POST['email'] ?? '';
+            $mdp = $_POST['mdp'] ?? '';
+
             $model = new UserModel($this->pdo);
             $user = $model->getByEmail($email);
 
-            // Vérification simple (mettre password_verify si haché)
-            if ($user && $mdp === $user['mdp']) {
+            // password_verify compare le mot de passe saisi avec le hachage en BDD
+            if ($user && password_verify($mdp, $user['mdp'])) {
                 $_SESSION['user_id'] = $user['id_utilisateur'];
                 $_SESSION['pseudo'] = $user['pseudo'];
                 $_SESSION['role'] = $user['role'];
@@ -28,25 +28,26 @@ class AuthController extends Controller {
 
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Récupération des données du formulaire
-            $pseudo = $_POST['pseudo'];
-            $email = $_POST['email'];
+            // Nettoyage basique des données
+            $pseudo = trim($_POST['pseudo']);
+            $email = trim($_POST['email']);
             $mdp = $_POST['mdp'];
-            $nom = $_POST['nom'];
-            $prenom = $_POST['prenom'];
+            $nom = trim($_POST['nom']);
+            $prenom = trim($_POST['prenom']);
             $date = $_POST['date_naissance'];
 
+            if (empty($pseudo) || empty($email) || empty($mdp)) {
+                $this->render('auth/register', ['error' => 'Veuillez remplir tous les champs obligatoires.']);
+                return;
+            }
+
             $model = new UserModel($this->pdo);
-            
-            // Création
-            // (Assure-toi que la méthode createUser dans UserModel accepte bien ces 6 arguments)
             $success = $model->createUser($pseudo, $email, $mdp, $nom, $prenom, $date);
 
             if ($success) {
-                // Succès -> Redirection vers Login
                 $this->redirect('index.php?controller=Auth&action=login');
             } else {
-                $this->render('auth/register', ['error' => 'Erreur lors de l\'inscription (Email ou Pseudo déjà pris ?)']);
+                $this->render('auth/register', ['error' => 'Erreur : Email ou Pseudo déjà utilisé.']);
             }
         } else {
             $this->render('auth/register');
