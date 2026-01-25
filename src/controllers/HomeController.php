@@ -2,6 +2,7 @@
 
 require_once 'controllers/Controller.php';
 require_once 'models/PostModel.php';
+require_once 'models/VoteModel.php';
 
 class HomeController extends Controller {
 
@@ -25,6 +26,16 @@ class HomeController extends Controller {
 
     public function faq() {
         $this->render('faq'); // Affiche views/faq.php
+    }
+
+    public function vote() {
+        $voteModel = new VoteModel($this->pdo);
+        $userId = $_SESSION['user_id'];
+        $postId = $_POST['post_id'];
+        $voteValue = $_POST['vote_value'];
+
+        $voteModel->votePost($userId, $postId, $voteValue);
+        $this->redirect('index.php?controller=Home&action=index');
     }
 }
 

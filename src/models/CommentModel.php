@@ -27,7 +27,7 @@ class CommentModel extends Model {
         $stmtVote->execute([$viewerId, $postId]);
         $myVote = $stmtVote->fetchColumn(); // 1, -1 ou false
 
-        // La requête de base récupère le commentaire + infos user + SI C'EST UN AMI + LE VOTE DE L'AUTEUR DU COM
+        // La requête de base récupère le commentaire + infos user + si c'est un ami + le vote de l'auteur du commentaire
         $sql = "SELECT c.*, u.pseudo, u.photo_profil,
                 (SELECT vote FROM vote WHERE id_utilisateur = c.id_utilisateur AND id_post = c.id_post) as author_vote,
                 (SELECT COUNT(*) FROM ami WHERE (id_utilisateur1 = :me AND id_utilisateur2 = c.id_utilisateur) OR (id_utilisateur1 = c.id_utilisateur AND id_utilisateur2 = :me)) as is_friend
@@ -43,7 +43,6 @@ class CommentModel extends Model {
             $sql .= "ORDER BY c.date_com ASC";
         }
         elseif ($sortType === 'pertinence') {
-            // LE CŒUR DE TA DEMANDE :
             // 1. D'abord les amis (is_friend DESC)
             // 2. Ensuite ceux qui ont voté comme moi (Si j'ai liké, je veux voir les likers)
             

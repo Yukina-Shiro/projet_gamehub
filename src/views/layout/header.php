@@ -3,7 +3,7 @@
 $headerAvatar = 'https://via.placeholder.com/40'; 
 if (isset($_SESSION['user_id'])) {
     if (!isset($pdo)) { global $pdo; }
-    $stmtH = $pdo->prepare("SELECT photo_profil FROM utilisateur WHERE id_utilisateur = ?");
+    $stmtH = $pdo->prepare("SELECT photo_profil FROM Utilisateur WHERE id_utilisateur = ?");
     $stmtH->execute([$_SESSION['user_id']]);
     $resH = $stmtH->fetch();
     if ($resH && !empty($resH['photo_profil'])) {
