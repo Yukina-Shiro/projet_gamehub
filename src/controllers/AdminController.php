@@ -14,7 +14,7 @@ class AdminController extends Controller {
     }
 
     public function index() {
-        // Filtrage par date d'inscription
+        // Point 1 : Filtrage par date d'inscription
         $date = $_GET['filter_date'] ?? null;
         $sql = "SELECT * FROM utilisateur";
         if ($date) {
@@ -39,21 +39,36 @@ class AdminController extends Controller {
         ]);
     }
 
-    // Envoi d'e-mails groupés aux membres sélectionnés
+    // NOUVEAU : Promouvoir ou rétrograder un utilisateur
+    public function toggleRole() {
+        if (isset($_GET['id']) && $_GET['id'] != $_SESSION['user_id']) {
+            $id = $_GET['id'];
+
+            // On récupère le rôle actuel
+            $stmt = $this->pdo->prepare("SELECT role FROM utilisateur WHERE id_utilisateur = ?");
+            $stmt->execute([$id]);
+            $user = $stmt->fetch();
+
+            if ($user) {
+                $newRole = ($user['role'] === 'admin') ? 'user' : 'admin';
+                $update = $this->pdo->prepare("UPDATE utilisateur SET role = ? WHERE id_utilisateur = ?");
+                $update->execute([$newRole, $id]);
+            }
+        }
+        $this->redirect('index.php?controller=Admin&action=index');
+    }
+
     public function sendMassMail() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['emails'])) {
             $subject = $_POST['subject'];
             $message = $_POST['message'];
-            $recipients = $_POST['emails'];
-
-            foreach ($recipients as $to) {
+            foreach ($_POST['emails'] as $to) {
                 mail($to, $subject, $message, "From: admin@gamehub.com");
             }
             $this->redirect('index.php?controller=Admin&action=index&msg=success');
         }
     }
 
-    // Bloquer / Débloquer un contenu sans le supprimer
     public function blockPost() {
         if (isset($_GET['id'])) {
             $postModel = new PostModel($this->pdo);
@@ -64,17 +79,13 @@ class AdminController extends Controller {
         $this->redirect('index.php?controller=Admin&action=index');
     }
 
-    // Supprimer un membre
     public function banUser() {
         if (isset($_GET['id']) && $_GET['id'] != $_SESSION['user_id']) {
-            $sql = "DELETE FROM utilisateur WHERE id_utilisateur = ?";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$_GET['id']]);
+            $this->pdo->prepare("DELETE FROM utilisateur WHERE id_utilisateur = ?")->execute([$_GET['id']]);
         }
         $this->redirect('index.php?controller=Admin&action=index');
     }
 
-    // Supprimer une information (un post)
     public function deletePost() {
         if (isset($_GET['id'])) {
             $postModel = new PostModel($this->pdo);

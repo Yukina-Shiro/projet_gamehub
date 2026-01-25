@@ -18,7 +18,7 @@
                 <th style="padding: 10px;"><input type="checkbox" onclick="toggleAll(this)"></th>
                 <th>Pseudo</th>
                 <th>Email</th>
-                <th>Inscription</th>
+                <th>Rôle</th>
                 <th>Actions</th>
             </tr>
             <?php foreach($users as $u): ?>
@@ -26,11 +26,25 @@
                 <td style="padding: 10px;"><input type="checkbox" name="emails[]" value="<?= $u['email'] ?>"></td>
                 <td><?= htmlspecialchars($u['pseudo']) ?></td>
                 <td><?= htmlspecialchars($u['email']) ?></td>
-                <td><?= date('d/m/Y', strtotime($u['date_creation'])) ?></td>
                 <td>
-                    <a href="index.php?controller=Admin&action=banUser&id=<?= $u['id_utilisateur'] ?>"
-                       onclick="return confirm('Supprimer ce membre définitivement ?')"
-                       style="color:var(--danger); font-weight: bold;">Supprimer</a>
+                    <span class="badge" style="padding: 2px 8px; border-radius: 4px; background: <?= $u['role'] === 'admin' ? '#dc3545' : '#6c757d' ?>; color: white; font-size: 0.8em;">
+                        <?= strtoupper($u['role']) ?>
+                    </span>
+                </td>
+                <td>
+                    <?php if($u['id_utilisateur'] != $_SESSION['user_id']): ?>
+                        <a href="index.php?controller=Admin&action=toggleRole&id=<?= $u['id_utilisateur'] ?>"
+                           style="color: var(--brand-color); font-size: 0.9em; margin-right: 10px;"
+                           onclick="return confirm('Voulez-vous vraiment <?= $u['role'] === 'admin' ? 'rétrograder' : 'promouvoir' ?> <?= htmlspecialchars($u['pseudo']) ?> ?');">
+                           <?= $u['role'] === 'admin' ? 'Rétrograder' : 'Promouvoir' ?>
+                        </a>
+
+                        <a href="index.php?controller=Admin&action=banUser&id=<?= $u['id_utilisateur'] ?>"
+                           onclick="return confirm('Supprimer ce membre définitivement ?')"
+                           style="color:var(--danger); font-weight: bold;">Supprimer</a>
+                    <?php else: ?>
+                        <small style="color:gray;">(Moi)</small>
+                    <?php endif; ?>
                 </td>
             </tr>
             <?php endforeach; ?>
