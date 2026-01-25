@@ -1,5 +1,13 @@
 <?php 
-include 'views/layout/header.php'; 
+require_once 'models/VoteModel.php';
+require_once 'models/CommentModel.php';
+require_once 'models/FriendModel.php';
+global $pdo;
+$voteModel = new VoteModel($pdo);
+$commentModel = new CommentModel($pdo);
+$friendModel = new FriendModel($pdo);
+$myFriends = isset($_SESSION['user_id']) ? $friendModel->getFriendsList($_SESSION['user_id']) : []; 
+include 'views/layout/header.php';
 
 // --- LOGIQUE DE RETOUR INTELLIGENT ---
 // Par défaut, on retourne à l'accueil
@@ -36,18 +44,22 @@ if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'index.p
             <img src="uploads/<?= htmlspecialchars($post['photo']) ?>" style="max-width:100%; border-radius: 8px; margin-bottom: 20px;">
         <?php endif; ?>
 
-        <div style="display: flex; gap: 15px;">
-             <a href="index.php?controller=Post&action=vote&id=<?= $post['id_post'] ?>&value=1" style="text-decoration:none;">
-                <button style="width:auto; background: <?= $myVote == 1 ? '#28a745' : '#ccc' ?>; border-radius: 20px;">
-                    👍 <?= $stats['nb_likes'] ?>
-                </button>
-            </a>
-            <a href="index.php?controller=Post&action=vote&id=<?= $post['id_post'] ?>&value=-1" style="text-decoration:none;">
-                <button style="width:auto; background: <?= $myVote == -1 ? '#dc3545' : '#ccc' ?>; border-radius: 20px;">
-                    👎 <?= $stats['nb_dislikes'] ?>
-                </button>
-            </a>
-        </div>
+        <div class="post-actions">
+                        <div class="post-actions-left">
+                            <button class="action-btn btn-like <?= $myVote == 1 ? 'active' : '' ?>" onclick="voteAjax(<?= $post['id_post'] ?>, 1)">
+                                <i class="fa-solid fa-thumbs-up"></i> <span class="count-like-<?= $post['id_post'] ?>"><?= $stats['nb_likes'] ?></span>
+                            </button>
+                            <button class="action-btn btn-dislike <?= $myVote == -1 ? 'active' : '' ?>" onclick="voteAjax(<?= $post['id_post'] ?>, -1)">
+                                <i class="fa-solid fa-thumbs-down"></i> <span class="count-dislike-<?= $post['id_post'] ?>"><?= $stats['nb_dislikes'] ?></span>
+                            </button>
+                            <button class="action-btn btn-comment" onclick="toggleComments(<?= $post['id_post'] ?>)">
+                                <i class="fa-solid fa-comment"></i> <span><?= count($comments) ?></span>
+                            </button>
+                        </div>
+                        <div class="post-actions-right">
+                            <button class="action-btn btn-share" onclick="openShareModal(<?= $post['id_post'] ?>)"><i class="fa-solid fa-share"></i></button>
+                        </div>
+                    </div>
     </div>
 
     <div style="margin-top: 30px;">

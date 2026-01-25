@@ -34,15 +34,16 @@ class AuthController extends Controller {
             $mdp = $_POST['mdp'];
             $nom = trim($_POST['nom']);
             $prenom = trim($_POST['prenom']);
+            $telephone = trim($_POST['telephone']);
             $date = $_POST['date_naissance'];
 
-            if (empty($pseudo) || empty($email) || empty($mdp)) {
+            if (empty($pseudo) || empty($email) || empty($mdp) || empty($nom) || empty($prenom) || empty($telephone)) {
                 $this->render('auth/register', ['error' => 'Veuillez remplir tous les champs obligatoires.']);
                 return;
             }
 
             $model = new UserModel($this->pdo);
-            $success = $model->createUser($pseudo, $email, $mdp, $nom, $prenom, $date);
+            $success = $model->createUser($pseudo, $email, $telephone, $mdp, $nom, $prenom, $date);
 
             if ($success) {
                 $this->redirect('index.php?controller=Auth&action=login');

@@ -5,12 +5,12 @@ require_once 'models/NotificationModel.php';
 class CommentModel extends Model {
 
     public function addComment($userId, $postId, $text) {
-        $sql = "INSERT INTO commentaire (id_utilisateur, id_post, commentaire) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO Commentaire (id_utilisateur, id_post, commentaire, date_com) VALUES (?, ?, ?, NOW())";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $postId, $text]);
 
         // Notification
-        $stmtPost = $this->pdo->prepare("SELECT id_utilisateur FROM post WHERE id_post = ?");
+        $stmtPost = $this->pdo->prepare("SELECT id_utilisateur FROM Post WHERE id_post = ?");
         $stmtPost->execute([$postId]);
         $authorId = $stmtPost->fetchColumn();
 
@@ -23,16 +23,16 @@ class CommentModel extends Model {
     // L'ALGORITHME DE TRI INTELLIGENT
     public function getCommentsSorted($postId, $viewerId, $sortType = 'pertinence') {
         // On récupère d'abord le vote du visiteur pour savoir ce qu'il préfère
-        $stmtVote = $this->pdo->prepare("SELECT vote FROM vote WHERE id_utilisateur = ? AND id_post = ?");
+        $stmtVote = $this->pdo->prepare("SELECT vote FROM Vote WHERE id_utilisateur = ? AND id_post = ?");
         $stmtVote->execute([$viewerId, $postId]);
         $myVote = $stmtVote->fetchColumn(); // 1, -1 ou false
 
         // La requête de base récupère le commentaire + infos user + SI C'EST UN AMI + LE VOTE DE L'AUTEUR DU COM
         $sql = "SELECT c.*, u.pseudo, u.photo_profil,
-                (SELECT vote FROM vote WHERE id_utilisateur = c.id_utilisateur AND id_post = c.id_post) as author_vote,
-                (SELECT COUNT(*) FROM ami WHERE (id_utilisateur1 = :me AND id_utilisateur2 = c.id_utilisateur) OR (id_utilisateur1 = c.id_utilisateur AND id_utilisateur2 = :me)) as is_friend
-                FROM commentaire c
-                JOIN utilisateur u ON c.id_utilisateur = u.id_utilisateur
+                (SELECT vote FROM Vote WHERE id_utilisateur = c.id_utilisateur AND id_post = c.id_post) as author_vote,
+                (SELECT COUNT(*) FROM Ami WHERE (id_utilisateur1 = :me AND id_utilisateur2 = c.id_utilisateur) OR (id_utilisateur1 = c.id_utilisateur AND id_utilisateur2 = :me)) as is_friend
+                FROM Commentaire c
+                JOIN Utilisateur u ON c.id_utilisateur = u.id_utilisateur
                 WHERE c.id_post = :postid ";
 
         // Gestion des tris
