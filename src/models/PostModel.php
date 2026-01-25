@@ -7,89 +7,71 @@ require_once 'models/NotificationModel.php';
 
 class PostModel extends Model {
 
-    // --- LE MUR (FEED) ---
-    // --- FIL GLOBAL (Tout le monde + Public) ---
+    // FIL GLOBAL : Masque les posts bloqués (is_blocked = 0)
     public function getGlobalFeed($myId) {
         $sql = "SELECT p.*, u.pseudo, u.photo_profil
-                FROM Post p
-                JOIN Utilisateur u ON p.id_utilisateur = u.id_utilisateur
-                WHERE p.statut = 'public' 
-                   OR p.id_utilisateur = ? 
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                WHERE (p.statut = 'public'
+                   OR p.id_utilisateur = ?
                    OR (p.statut = 'ami' AND p.id_utilisateur IN (
-                        SELECT id_utilisateur1 FROM Ami WHERE id_utilisateur2 = ? AND statut = 'valide'
-                        UNION SELECT id_utilisateur2 FROM Ami WHERE id_utilisateur1 = ? AND statut = 'valide'
-                   ))
+                        SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
+                        UNION SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+                   )))
+                AND p.is_blocked = 0
                 ORDER BY p.date_creation DESC LIMIT 50";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$myId, $myId, $myId]);
         return $stmt->fetchAll();
     }
-    public function getFeed($myId) {
-        $sql = "
-            SELECT p.*, u.pseudo, u.photo_profil,
-            (SELECT IFNULL(SUM(vote), 0) FROM Vote WHERE id_post = p.id_post) as score
-            FROM Post p
-            JOIN Utilisateur u ON p.id_utilisateur = u.id_utilisateur
-            WHERE 
-                p.statut = 'public'
-                OR p.id_utilisateur = ? 
-                OR (
-                    p.statut = 'ami' 
-                    AND p.id_utilisateur IN (
-                        SELECT id_utilisateur1 FROM Ami WHERE id_utilisateur2 = ? AND statut = 'valide'
-                        UNION
-                        SELECT id_utilisateur2 FROM Ami WHERE id_utilisateur1 = ? AND statut = 'valide'
-                    )
-                )
-            ORDER BY p.date_creation DESC LIMIT 50";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$myId, $myId, $myId]);
-        return $stmt->fetchAll();
-    }
 
-    // --- FIL PERSO (Mes amis + Mes abonnements uniquement) ---
+    // FIL PERSO : Masque les posts bloqués
     public function getPersoFeed($myId) {
         $sql = "SELECT p.*, u.pseudo, u.photo_profil
-                FROM Post p
-                JOIN Utilisateur u ON p.id_utilisateur = u.id_utilisateur
-                WHERE 
-                -- Mes posts
-                p.id_utilisateur = ?
-                OR 
-                -- Posts de mes AMIS
-                p.id_utilisateur IN (
-                    SELECT id_utilisateur1 FROM Ami WHERE id_utilisateur2 = ? AND statut = 'valide'
-                    UNION SELECT id_utilisateur2 FROM Ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                WHERE (
+                    p.id_utilisateur = ?
+                    OR p.id_utilisateur IN (
+                        SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
+                        UNION SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+                    )
+                    OR p.id_utilisateur IN (
+                        SELECT suivi FROM relation WHERE suiveur = ?
+                    )
                 )
-                OR
-                -- Posts des gens que je SUIS (Follow)
-                p.id_utilisateur IN (
-                    SELECT suivi FROM Relation WHERE suiveur = ?
-                )
+                AND p.is_blocked = 0
                 ORDER BY p.date_creation DESC LIMIT 50";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$myId, $myId, $myId, $myId]);
         return $stmt->fetchAll();
     }
 
-    // --- POSTS D'UN PROFIL ---
+    // POSTS D'UN PROFIL : Masque les bloqués pour les autres, montre tout à l'admin
     public function getUserPosts($userId) {
         $sql = "SELECT p.*, u.pseudo, u.photo_profil,
-                (SELECT IFNULL(SUM(vote), 0) FROM Vote WHERE id_post = p.id_post) as score
-                FROM Post p
-                JOIN Utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                (SELECT IFNULL(SUM(vote), 0) FROM vote WHERE id_post = p.id_post) as score
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
                 WHERE p.id_utilisateur = ?
+                AND p.is_blocked = 0
                 ORDER BY p.date_creation DESC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId]);
         return $stmt->fetchAll();
     }
 
-    // --- CRÉATION ---
+    // ADMIN : Récupère absolument tout
+    public function getAllPostsForAdmin() {
+        $sql = "SELECT p.*, u.pseudo FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                ORDER BY p.date_creation DESC";
+        return $this->pdo->query($sql)->fetchAll();
+    }
+
     public function createPost($userId, $titre, $description, $visibilite, $photo = null) {
-        $sql = "INSERT INTO Post (id_utilisateur, titre, description, statut, photo, date_creation) VALUES (?, ?, ?, ?, ?, NOW())";
+        $sql = "INSERT INTO post (id_utilisateur, titre, description, statut, photo, date_creation) VALUES (?, ?, ?, ?, ?, NOW())";
         $stmt = $this->pdo->prepare($sql);
         $success = $stmt->execute([$userId, $titre, $description, $visibilite, $photo]);
 
@@ -99,17 +81,13 @@ class PostModel extends Model {
         return $success;
     }
 
-    // Méthode privée pour notifier le réseau via les autres modèles
     private function notifyNetwork($userId) {
         $friendModel = new FriendModel($this->pdo);
         $followModel = new FollowModel($this->pdo);
         $notifModel = new NotificationModel($this->pdo);
 
-        // Récupérer les IDs des destinataires
         $amis = $friendModel->getFriendsIds($userId);
         $followers = $followModel->getFollowersIds($userId);
-
-        // Fusionner et dédoublonner
         $ids = array_unique(array_merge($amis, $followers));
 
         foreach($ids as $destId) {
@@ -117,11 +95,10 @@ class PostModel extends Model {
         }
     }
 
-    // --- MODIFICATION / SUPPRESSION ---
     public function getPostById($idPost) {
-        $sql = "SELECT p.*, u.pseudo, u.photo_profil 
-                FROM Post p
-                JOIN Utilisateur u ON p.id_utilisateur = u.id_utilisateur
+        $sql = "SELECT p.*, u.pseudo, u.photo_profil
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
                 WHERE id_post = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$idPost]);
@@ -129,16 +106,20 @@ class PostModel extends Model {
     }
 
     public function updatePost($idPost, $titre, $desc, $statut) {
-        $sql = "UPDATE Post SET titre = ?, description = ?, statut = ? WHERE id_post = ?";
+        $sql = "UPDATE post SET titre = ?, description = ?, statut = ? WHERE id_post = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$titre, $desc, $statut, $idPost]);
     }
 
+    public function toggleBlock($idPost, $status) {
+        $sql = "UPDATE post SET is_blocked = ? WHERE id_post = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$status, $idPost]);
+    }
+
     public function deletePost($idPost) {
-        $sql = "DELETE FROM Post WHERE id_post = ?";
+        $sql = "DELETE FROM post WHERE id_post = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$idPost]);
     }
 }
-
-?>

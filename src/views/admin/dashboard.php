@@ -1,77 +1,79 @@
 <?php include 'views/layout/header.php'; ?>
 
 <div class="container">
-    <h1>Administration GameHub</h1>
+    <h2>🛡️ Administration GameHub</h2>
 
-    <section style="margin-bottom: 30px; padding: 15px; background: var(--secondary-bg); border-radius: 8px;">
-        <h3>Visualiser les membres par date</h3>
-        <form method="get" action="index.php" style="display: flex; gap: 10px;">
-            <input type="hidden" name="controller" value="Admin">
-            <input type="hidden" name="action" value="index">
-            <input type="date" name="filter_date" value="<?= $filter_date ?? '' ?>" style="margin:0;">
-            <button type="submit" style="width: auto;">Filtrer</button>
-            <a href="index.php?controller=Admin&action=index" style="padding:10px;">Réinitialiser</a>
-        </form>
-    </section>
+    <form method="post" action="index.php?controller=Admin&action=sendMassMail">
+        <h3>1. Gestion des Membres</h3>
 
-    <section>
-        <h3>Membres inscrits</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-            <tr style="background: var(--brand-color); color: white; text-align: left;">
-                <th style="padding: 10px;">Pseudo</th>
+        <div style="margin-bottom: 15px; padding: 10px; background: var(--secondary-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+            <label>Filtrer par date d'inscription : </label>
+            <input type="date" name="filter_date" value="<?= htmlspecialchars($filter_date ?? '') ?>"
+                   onchange="location.href='index.php?controller=Admin&action=index&filter_date='+this.value" style="width:auto; margin:0;">
+            <a href="index.php?controller=Admin&action=index" style="margin-left:10px; font-size: 0.9em;">Effacer le filtre</a>
+        </div>
+
+        <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background:var(--brand-color); color:white; text-align: left;">
+                <th style="padding: 10px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+                <th>Pseudo</th>
                 <th>Email</th>
-                <th>Date Inscription</th>
+                <th>Inscription</th>
                 <th>Actions</th>
             </tr>
             <?php foreach($users as $u): ?>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 10px;"><?= htmlspecialchars($u['pseudo']) ?></td>
-                    <td><?= htmlspecialchars($u['email']) ?></td>
-                    <td><?= date('d/m/Y', strtotime($u['date_creation'])) ?></td>
-                    <td>
-                        <button onclick="openMailModal('<?= $u['email'] ?>')" style="width:auto; background:#17a2b8; padding:5px 10px;">Email</button>
-                        <a href="index.php?controller=Admin&action=banUser&id=<?= $u['id_utilisateur'] ?>"
-                           style="color: var(--danger); margin-left:10px;"
-                           onclick="return confirm('Supprimer ce membre ?');">Supprimer</a>
-                    </td>
-                </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 10px;"><input type="checkbox" name="emails[]" value="<?= $u['email'] ?>"></td>
+                <td><?= htmlspecialchars($u['pseudo']) ?></td>
+                <td><?= htmlspecialchars($u['email']) ?></td>
+                <td><?= date('d/m/Y', strtotime($u['date_creation'])) ?></td>
+                <td>
+                    <a href="index.php?controller=Admin&action=banUser&id=<?= $u['id_utilisateur'] ?>"
+                       onclick="return confirm('Supprimer ce membre définitivement ?')"
+                       style="color:var(--danger); font-weight: bold;">Supprimer</a>
+                </td>
+            </tr>
             <?php endforeach; ?>
         </table>
-    </section>
 
-    <section>
-        <h3>Modération des Publications</h3>
-        <?php foreach($posts as $p): ?>
-            <div class="post-card" style="padding: 10px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong>@<?= htmlspecialchars($p['pseudo']) ?></strong>: <?= htmlspecialchars($p['titre']) ?>
-                    <br><small><?= htmlspecialchars(substr($p['description'], 0, 50)) ?>...</small>
+        <div style="padding:15px; background:var(--secondary-bg); border-radius:8px; border: 1px solid var(--border-color);">
+            <h4>✉️ Envoyer un message aux membres sélectionnés</h4>
+            <input type="text" name="subject" placeholder="Sujet du mail" required>
+            <textarea name="message" rows="4" placeholder="Message aux membres..." required></textarea>
+            <button type="submit" style="background:var(--brand-color);">Envoyer les e-mails</button>
+        </div>
+    </form>
+
+    <h3 style="margin-top:40px;">2. Modération des Contenus</h3>
+    <div class="feed">
+        <?php if(empty($posts)): ?>
+            <p>Aucun post trouvé.</p>
+        <?php else: foreach($posts as $p): ?>
+            <div class="post-card" style="<?= $p['is_blocked'] ? 'border: 2px solid orange; background: #fff5e6;' : '' ?>">
+                <strong>@<?= htmlspecialchars($p['pseudo']) ?></strong> : <?= htmlspecialchars($p['titre']) ?>
+                <p style="font-size: 0.9em; color: var(--text-secondary);"><?= htmlspecialchars($p['description']) ?></p>
+
+                <div style="text-align:right; margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <a href="index.php?controller=Admin&action=blockPost&id=<?= $p['id_post'] ?>">
+                        <button style="width:auto; background:<?= $p['is_blocked'] ? '#28a745' : '#fd7e14' ?>; padding: 5px 15px;">
+                            <?= $p['is_blocked'] ? '✅ Débloquer' : '🚫 Bloquer' ?>
+                        </button>
+                    </a>
+                    <a href="index.php?controller=Admin&action=deletePost&id=<?= $p['id_post'] ?>"
+                       onclick="return confirm('Supprimer définitivement ce post ?')"
+                       style="color:var(--danger); font-weight: bold; align-self:center;">Supprimer</a>
                 </div>
-                <a href="index.php?controller=Admin&action=deletePost&id=<?= $p['id_post'] ?>"
-                   style="color: var(--danger); font-weight:bold;"
-                   onclick="return confirm('Supprimer définitivement ce contenu ?');">Bloquer / Supprimer</a>
             </div>
-        <?php endforeach; ?>
-    </section>
-</div>
-
-<div id="mailModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
-    <div class="modal-content">
-        <h3>Envoyer un avertissement / information</h3>
-        <form action="index.php?controller=Admin&action=sendMail" method="post">
-            <input type="hidden" name="email" id="mailDest">
-            <input type="text" name="subject" placeholder="Sujet" required>
-            <textarea name="message" rows="5" placeholder="Votre message..." required></textarea>
-            <button type="submit">Envoyer le mail</button>
-        </form>
-        <button onclick="document.getElementById('mailModal').style.display='none'" class="btn-cancel-modal">Annuler</button>
+        <?php endforeach; endif; ?>
     </div>
 </div>
 
 <script>
-function openMailModal(email) {
-    document.getElementById('mailDest').value = email;
-    document.getElementById('mailModal').style.display = 'flex';
+function toggleAll(source) {
+    const checkboxes = document.getElementsByName('emails[]');
+    for(let i=0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
 }
 </script>
 
