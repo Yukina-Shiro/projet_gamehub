@@ -134,6 +134,26 @@ class UserController extends Controller {
 
         $this->render('user/edit', ['user' => $user]);
     }
+
+    public function search() {
+        if (!isset($_SESSION['user_id'])) $this->redirect('index.php');
+        
+        $results = [];
+        $query = "";
+
+        if (isset($_GET['q']) && !empty($_GET['q'])) {
+            $userModel = new UserModel($this->pdo);
+            $query = $_GET['q'];
+            $results = $userModel->searchUsers($query);
+        }
+
+        $this->render('user/search', ['results' => $results, 'query' => $query]);
+    }
+
+    public function settings() {
+        if (!isset($_SESSION['user_id'])) $this->redirect('index.php');
+        $this->render('user/settings'); // Affiche views/user/settings.php
+    }
 }
 
 ?>

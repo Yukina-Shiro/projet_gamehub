@@ -47,6 +47,17 @@ class UserModel extends Model {
             return $stmt->execute([$pseudo, $bio, $nom, $prenom, $id]);
         }
     }
+
+    // Recherche d'utilisateurs par pseudo (partiel)
+    public function searchUsers($query) {
+        $sql = "SELECT id_utilisateur, pseudo, photo_profil, bio 
+                FROM utilisateur 
+                WHERE pseudo LIKE ? 
+                LIMIT 20";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['%' . $query . '%']);
+        return $stmt->fetchAll();
+    }
 }
 
 ?>

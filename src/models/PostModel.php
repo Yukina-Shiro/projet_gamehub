@@ -8,28 +8,45 @@ require_once 'models/NotificationModel.php';
 class PostModel extends Model {
 
     // --- LE MUR (FEED) ---
-    public function getFeed($myId) {
-        $sql = "
-            SELECT p.*, u.pseudo, u.photo_profil,
-            (SELECT IFNULL(SUM(vote), 0) FROM vote WHERE id_post = p.id_post) as score
-            FROM post p
-            JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
-            WHERE 
-                p.statut = 'public'
-                OR p.id_utilisateur = ? 
-                OR (
-                    p.statut = 'ami' 
-                    AND p.id_utilisateur IN (
+    // --- FIL GLOBAL (Tout le monde + Public) ---
+    public function getGlobalFeed($myId) {
+        $sql = "SELECT p.*, u.pseudo, u.photo_profil
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                WHERE p.statut = 'public' 
+                   OR p.id_utilisateur = ? 
+                   OR (p.statut = 'ami' AND p.id_utilisateur IN (
                         SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
-                        UNION
-                        SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
-                    )
-                )
-            ORDER BY p.date_creation DESC LIMIT 50";
-        
+                        UNION SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+                   ))
+                ORDER BY p.date_creation DESC LIMIT 50";
         $stmt = $this->pdo->prepare($sql);
-
         $stmt->execute([$myId, $myId, $myId]);
+        return $stmt->fetchAll();
+    }
+
+    // --- FIL PERSO (Mes amis + Mes abonnements uniquement) ---
+    public function getPersoFeed($myId) {
+        $sql = "SELECT p.*, u.pseudo, u.photo_profil
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                WHERE 
+                -- Mes posts
+                p.id_utilisateur = ?
+                OR 
+                -- Posts de mes AMIS
+                p.id_utilisateur IN (
+                    SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
+                    UNION SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+                )
+                OR
+                -- Posts des gens que je SUIS (Follow)
+                p.id_utilisateur IN (
+                    SELECT suivi FROM relation WHERE suiveur = ?
+                )
+                ORDER BY p.date_creation DESC LIMIT 50";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$myId, $myId, $myId, $myId]);
         return $stmt->fetchAll();
     }
 
@@ -78,7 +95,10 @@ class PostModel extends Model {
 
     // --- MODIFICATION / SUPPRESSION ---
     public function getPostById($idPost) {
-        $sql = "SELECT * FROM post WHERE id_post = ?";
+        $sql = "SELECT p.*, u.pseudo, u.photo_profil 
+                FROM post p
+                JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
+                WHERE id_post = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$idPost]);
         return $stmt->fetch();
