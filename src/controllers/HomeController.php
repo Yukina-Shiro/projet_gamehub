@@ -34,7 +34,7 @@ class HomeController extends Controller {
         $postId = $_POST['post_id'];
         $voteValue = $_POST['vote_value'];
 
-        $voteModel->votePost($userId, $postId, $voteValue);
+        $voteModel->toggleVote($userId, $postId, $voteValue);
         $this->redirect('index.php?controller=Home&action=index');
     }
 }

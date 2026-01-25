@@ -2,6 +2,10 @@
 
 <div class="container">
     <h2>🔔 Vos Notifications</h2>
+    <a href="index.php?controller=Notification&action=markAllRead" class="btn-primary" 
+    style="display: inline-block; text-decoration: none;">
+        Marquer tout comme vu
+    </a>
 
     <?php if (empty($notifs)): ?>
         <p style="text-align:center; color:var(--text-secondary); margin-top:30px;">Aucune notification.</p>

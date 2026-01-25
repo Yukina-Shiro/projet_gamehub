@@ -34,8 +34,25 @@ class NotificationController extends Controller {
     public function markRead() {
         if (isset($_GET['id'])) {
             $notifModel = new NotificationModel($this->pdo);
-            $notifModel->markAsRead($_GET['id']);
+            $notifModel->markAsRead(notifId: $_GET['id']);
         }
+        header("Location: index.php?controller=Notification&action=index");
+        exit;
+    }
+
+    public function markAllRead() {
+        if (!isset($_SESSION['user_id'])) $this->redirect('index.php');
+
+        $notifModel = new NotificationModel($this->pdo);
+        
+        // Récupérer toutes les notifications non lues
+        $notifs = $notifModel->getUnreadNotifications($_SESSION['user_id']);
+        
+        // Marquer chacune comme lue
+        foreach ($notifs as $notif) {
+            $notifModel->markAsRead($notif['id_notif']);
+        }
+
         header("Location: index.php?controller=Notification&action=index");
         exit;
     }

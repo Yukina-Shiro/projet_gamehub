@@ -299,3 +299,19 @@ button { border-radius: 5px; padding: 10px; border: none; cursor: pointer; backg
 .btn-cancel-modal { background-color: var(--hover-bg) !important; color: var(--text-color) !important; margin-top: 10px; border: 1px solid var(--border-color) !important; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.btn-primary {
+    background-color: var(--brand-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    background-color: var(--brand-color);
+}
