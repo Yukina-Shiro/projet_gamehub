@@ -8,6 +8,7 @@ GameHub est un réseau social moderne dédié aux passionnés de jeux vidéo. Le
 - [Installation](#installation)
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Guide d'utilisation](#guide-dutilisation)
+- [Guide d'administration](#guide-dadministration)
 - [Structure du projet](#structure-du-projet)
 - [Modèle de données](#modèle-de-données)
 
@@ -98,8 +99,10 @@ http://localhost/sae_s301_projet_gamehub/src/index.php
   - Nouveaux posts de vos amis/abonnés
   - Votes sur vos posts
   - Commentaires
-- **Marquer comme lue** : Gérer les notifications
+- **Marquer comme lue** : Cliquez sur l'icône ✅ pour marquer une notification comme vue
+- **Marquer tout comme vu** : Cliquez sur le bouton violet en haut de la page pour marquer toutes les notifications comme lues en un seul clic
 - **Badge de notification** : Compteur de notifications non lues
+- **Suppression** : Cliquez sur ❌ pour supprimer une notification
 
 ### 💬 Messages (Chat)
 - **Conversation privée** : Discuter avec les amis
@@ -118,6 +121,14 @@ http://localhost/sae_s301_projet_gamehub/src/index.php
 
 ### ❓ FAQ
 - Questions fréquentes sur l'application
+
+### 🛡️ Administration
+- **Panneau d'administration** : Accès réservé aux administrateurs
+- **Gestion des utilisateurs** : Voir la liste des utilisateurs actifs
+- **Bannissement** : Bannir un utilisateur pour violation des règles
+- **Débannissement** : Restaurer l'accès à un utilisateur banni
+- **Statut utilisateur** : Consulter les utilisateurs actifs, bannissements en cours, etc.
+- **Logs d'administration** : Historique des actions administratives
 
 ---
 
@@ -162,6 +173,13 @@ http://localhost/sae_s301_projet_gamehub/src/index.php
 3. Vous recevrez les notifications de ses nouveaux posts publics
 4. L'utilisateur est notifié que vous le suivez
 
+### Gérer vos notifications
+
+1. Cliquez sur l'icône 🔔 en haut à droite
+2. **Marquer comme vu** : Cliquez sur ✅ à côté d'une notification
+3. **Marquer tout comme vu** : Cliquez sur le bouton violet en haut
+4. **Supprimer** : Cliquez sur ❌ pour supprimer une notification
+
 ### Gérer vos paramètres
 
 1. Cliquez sur votre avatar en haut à droite
@@ -174,6 +192,74 @@ http://localhost/sae_s301_projet_gamehub/src/index.php
 2. Cliquez sur **Modifier mon profil**
 3. Mettez à jour vos informations
 4. Sauvegardez
+
+---
+
+## 🛡️ Guide d'administration
+
+### Accéder au panneau d'administration
+
+1. Connectez-vous avec un compte administrateur
+2. Cliquez sur votre avatar en haut à droite
+3. Sélectionnez **Administration** (si vous avez les permissions)
+4. Vous accédez au tableau de bord
+
+### Gérer les utilisateurs
+
+1. Dans le panneau d'administration, allez dans **Gestion des utilisateurs**
+2. Vous voyez la liste de tous les utilisateurs avec leur statut :
+   - 🟢 **Actif** : Compte normal
+   - 🔴 **Banni** : Compte suspendu
+   - ⏱️ **Bannissement temporaire** : Compte banni jusqu'à une date spécifique
+
+### Bannir un utilisateur
+
+**Raisons courantes :**
+- Contenu inapproprié
+- Harcèlement
+- Spam
+- Violation des conditions d'utilisation
+
+**Procédure :**
+
+1. Accédez à la fiche utilisateur
+2. Cliquez sur **Bannir cet utilisateur**
+3. Choisissez le type de bannissement :
+   - **Bannissement permanent** : L'utilisateur ne peut plus accéder
+   - **Bannissement temporaire** : Jusqu'à une date spécifique
+4. Saisissez une raison (visible dans les logs)
+5. Validez
+
+**Effet immédiat :**
+- L'utilisateur est déconnecté
+- Ses posts sont masqués
+- Il ne peut plus se connecter
+- Il reçoit une notification de bannissement
+
+### Débannir un utilisateur
+
+1. Accédez à la fiche utilisateur banni
+2. Cliquez sur **Débannir cet utilisateur**
+3. Confirmez l'action
+4. L'utilisateur peut à nouveau accéder
+
+### Consulter les logs d'administration
+
+1. Dans le panneau d'administration, allez dans **Logs**
+2. Vous voyez l'historique complet des actions administratives :
+   - Bannissements
+   - Débannissements
+   - Suppressions de contenu
+   - Modifications de rôles
+
+### Modifier les rôles utilisateurs
+
+1. Accédez à la fiche utilisateur
+2. Cliquez sur **Modifier le rôle**
+3. Choisissez entre :
+   - **User** : Utilisateur normal
+   - **Admin** : Administrateur (accès au panneau d'administration)
+4. Validez
 
 ---
 
@@ -194,7 +280,7 @@ sae_s301_projet_gamehub/
 │   │   ├── PostController.php     # Posts & votes
 │   │   ├── ChatController.php     # Messages
 │   │   ├── NotificationController.php  # Notifications
-│   │   └── AdminController.php    # Administration
+│   │   └── AdminController.php    # Administration & bannissement
 │   ├── models/
 │   │   ├── Model.php             # Classe mère
 │   │   ├── UserModel.php         # Gestion utilisateurs
@@ -204,7 +290,9 @@ sae_s301_projet_gamehub/
 │   │   ├── FriendModel.php       # Gestion amitié
 │   │   ├── FollowModel.php       # Gestion abonnements
 │   │   ├── ChatModel.php         # Gestion messages
-│   │   └── NotificationModel.php # Gestion notifications
+│   │   ├── NotificationModel.php # Gestion notifications
+│   │   ├── AdminModel.php        # Gestion administration
+│   │   └── BanModel.php          # Gestion bannissements
 │   ├── views/
 │   │   ├── auth/
 │   │   │   ├── login.php         # Connexion
@@ -214,6 +302,11 @@ sae_s301_projet_gamehub/
 │   │   │   ├── edit.php          # Éditer profil
 │   │   │   ├── search.php        # Recherche utilisateurs
 │   │   │   └── settings.php      # Paramètres
+│   │   ├── admin/
+│   │   │   ├── dashboard.php     # Tableau de bord
+│   │   │   ├── users.php         # Gestion utilisateurs
+│   │   │   ├── bans.php          # Gestion bannissements
+│   │   │   └── logs.php          # Logs administratifs
 │   │   ├── chat/
 │   │   │   ├── index.php         # Liste conversations
 │   │   │   └── conversation.php  # Conversation
@@ -245,6 +338,30 @@ sae_s301_projet_gamehub/
 - photo_profil
 - date_naissance
 - role (user, admin)
+- statut (actif, banni)
+- date_ban (nullable)
+- raison_ban (nullable)
+```
+
+### Ban (Bannissement)
+```
+- id_ban (PK)
+- id_utilisateur (FK)
+- id_admin (FK)
+- raison
+- date_ban
+- date_fin_ban (NULL = permanent)
+- actif (0/1)
+```
+
+### Log Admin
+```
+- id_log (PK)
+- id_admin (FK)
+- action (ban, unban, delete_post, etc.)
+- cible_id (FK vers utilisateur/post)
+- raison
+- date_action
 ```
 
 ### Post
@@ -317,18 +434,22 @@ sae_s301_projet_gamehub/
 - **Injection SQL** : Protection par prepared statements (PDO)
 - **XSS** : Utilisation de `htmlspecialchars()` et `nl2br()`
 - **Vérification d'accès** : Contrôle dans les controllers
+- **Vérification de rôle** : Seuls les admins accèdent au panneau d'administration
+- **Audit** : Tous les logs administratifs sont enregistrés
 
 ---
 
 ## 🚀 Fonctionnalités futures
 
-- [ ] Système de modération
-- [ ] Blocage d'utilisateurs
+- [ ] Appels/signalement d'utilisateurs
+- [ ] Système de points de réputation
+- [ ] Blocage d'utilisateurs personnalisé
 - [ ] Notifications en temps réel (WebSocket)
 - [ ] Upload de vidéos
 - [ ] Badges et achievements
 - [ ] Systèmes de clans/équipes
 - [ ] Classement global
+- [ ] 2FA (Authentification à deux facteurs)
 
 ---
 
