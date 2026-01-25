@@ -6,7 +6,7 @@ class FriendModel extends Model {
 
     // Vérifie le statut (sont-ils amis ? demande en cours ?)
     public function getFriendshipStatus($me, $other) {
-        $sql = "SELECT statut, id_utilisateur1 FROM ami 
+        $sql = "SELECT statut, id_utilisateur1 FROM Ami 
                 WHERE (id_utilisateur1 = ? AND id_utilisateur2 = ?) 
                    OR (id_utilisateur1 = ? AND id_utilisateur2 = ?)";
         $stmt = $this->pdo->prepare($sql);
@@ -16,16 +16,16 @@ class FriendModel extends Model {
 
     // Récupérer la liste des IDs de mes amis (validés)
     public function getFriendsIds($userId) {
-        $sql = "SELECT id_utilisateur1 as id FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
+        $sql = "SELECT id_utilisateur1 as id FROM Ami WHERE id_utilisateur2 = ? AND statut = 'valide'
                 UNION
-                SELECT id_utilisateur2 as id FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'";
+                SELECT id_utilisateur2 as id FROM Ami WHERE id_utilisateur1 = ? AND statut = 'valide'";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $userId]);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function sendRequest($from, $to) {
-        $sql = "INSERT INTO ami (id_utilisateur1, id_utilisateur2, statut) VALUES (?, ?, 'attente')";
+        $sql = "INSERT INTO Ami (id_utilisateur1, id_utilisateur2, statut) VALUES (?, ?, 'attente')";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$from, $to]);
         
@@ -35,7 +35,7 @@ class FriendModel extends Model {
     }
 
     public function acceptRequest($me, $friendId) {
-        $sql = "UPDATE ami SET statut = 'valide' 
+        $sql = "UPDATE Ami SET statut = 'valide' 
                 WHERE (id_utilisateur1 = ? AND id_utilisateur2 = ?) 
                    OR (id_utilisateur1 = ? AND id_utilisateur2 = ?)";
         $stmt = $this->pdo->prepare($sql);
@@ -47,7 +47,7 @@ class FriendModel extends Model {
     }
 
     public function removeFriend($me, $other) {
-        $sql = "DELETE FROM ami 
+        $sql = "DELETE FROM Ami 
                 WHERE (id_utilisateur1 = ? AND id_utilisateur2 = ?) 
                    OR (id_utilisateur1 = ? AND id_utilisateur2 = ?)";
         $stmt = $this->pdo->prepare($sql);
@@ -57,8 +57,8 @@ class FriendModel extends Model {
     // Récupérer la liste COMPLÈTE des amis (Pseudo + Photo) pour l'affichage
     public function getFriendsList($userId) {
         $sql = "SELECT u.id_utilisateur, u.pseudo, u.photo_profil
-                FROM utilisateur u
-                JOIN ami a ON (u.id_utilisateur = a.id_utilisateur1 OR u.id_utilisateur = a.id_utilisateur2)
+                FROM Utilisateur u
+                JOIN Ami a ON (u.id_utilisateur = a.id_utilisateur1 OR u.id_utilisateur = a.id_utilisateur2)
                 WHERE (a.id_utilisateur1 = ? OR a.id_utilisateur2 = ?)
                 AND a.statut = 'valide'
                 AND u.id_utilisateur != ?"; // On exclut notre propre ID

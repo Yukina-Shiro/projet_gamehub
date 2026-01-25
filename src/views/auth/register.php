@@ -17,6 +17,9 @@
         <label for="prenom">Prénom</label>
         <input type="text" name="prenom" id="prenom" placeholder="Votre prénom" required>
 
+        <label for="telephone">Téléphone</label>
+        <input type="number" name="telephone" id="telephone" placeholder="Votre numéro de téléphone" required  maxlength="10" minlength="10">
+
         <label for="email">Email</label>
         <input type="email" name="email" id="email" placeholder="nom@exemple.com" required>
 
