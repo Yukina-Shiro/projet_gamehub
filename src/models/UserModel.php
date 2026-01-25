@@ -4,9 +4,9 @@ require_once 'models/Model.php';
 
 class UserModel extends Model {
 
-    // 1. Inscription (Code que tu m'as donné, avec le hachage)
+    // 1. Inscription
     public function createUser($pseudo, $email, $mdp, $nom, $prenom, $date_naissance) {
-        // Protection : Hachage du mot de passe avec l'algorithme par défaut (BCRYPT)
+        // Protection : Hachage du mot de passe avec l'algorithme par défaut 
         $mdp_hache = password_hash($mdp, PASSWORD_DEFAULT);
 
         $sql = "INSERT INTO utilisateur (pseudo, email, mdp, nom, prenom, date_naissance) VALUES (?, ?, ?, ?, ?, ?)";
@@ -15,7 +15,7 @@ class UserModel extends Model {
         return $stmt->execute([$pseudo, $email, $mdp_hache, $nom, $prenom, $date_naissance]);
     }
 
-    // 2. Connexion (Code que tu m'as donné)
+    // 2. Connexion
     public function getByEmail($email) {
         $sql = "SELECT * FROM utilisateur WHERE email = ?";
         $stmt = $this->pdo->prepare($sql);
