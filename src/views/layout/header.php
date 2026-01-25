@@ -3,11 +3,15 @@
 $headerAvatar = 'https://via.placeholder.com/40'; 
 if (isset($_SESSION['user_id'])) {
     if (!isset($pdo)) { global $pdo; }
-    $stmtH = $pdo->prepare("SELECT photo_profil FROM Utilisateur WHERE id_utilisateur = ?");
+    $stmtH = $pdo->prepare("SELECT photo_profil, role FROM utilisateur WHERE id_utilisateur = ?");
     $stmtH->execute([$_SESSION['user_id']]);
     $resH = $stmtH->fetch();
     if ($resH && !empty($resH['photo_profil'])) {
         $headerAvatar = 'uploads/' . $resH['photo_profil'];
+    }
+    // On s'assure que le rôle en session est à jour avec la base de données
+    if ($resH) {
+        $_SESSION['role'] = $resH['role'];
     }
 }
 ?>
@@ -38,6 +42,13 @@ if (isset($_SESSION['user_id'])) {
                 <div class="user-menu-container">
                     <img src="<?= htmlspecialchars($headerAvatar) ?>" class="header-user-avatar" id="avatarBtn">
                     <div id="userDropdown" class="dropdown-menu">
+
+                        <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                            <a href="index.php?controller=Admin&action=index" class="dropdown-item" style="color: #dc3545; font-weight: bold; border-bottom: 2px solid var(--border-color);">
+                                <i class="fa-solid fa-shield-halved"></i> Administration
+                            </a>
+                        <?php endif; ?>
+
                         <a href="index.php?controller=User&action=settings" class="dropdown-item">
                             <i class="fa-solid fa-gear"></i> Paramètres
                         </a>
