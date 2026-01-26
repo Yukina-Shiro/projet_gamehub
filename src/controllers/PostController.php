@@ -6,6 +6,53 @@ require_once 'models/CommentModel.php';
 
 class PostController extends Controller {
 
+    /**
+     * Affiche la page de détail d'un post avec ses commentaires
+     * Route : index.php?controller=Post&action=show&id=XX
+     */
+    public function show() {
+        if (!isset($_GET['id'])) $this->redirect('index.php');
+        
+        $postId = (int)$_GET['id'];
+        $userId = $_SESSION['user_id'] ?? 0;
+        $sort = $_GET['sort'] ?? 'pertinence';
+
+        $postModel = new PostModel($this->pdo);
+        $voteModel = new VoteModel($this->pdo);
+        $commentModel = new CommentModel($this->pdo);
+
+        // 1. Récupération du post (Vérification de l'existence)
+        $post = $postModel->getPostById($postId);
+        if (!$post) {
+            $_SESSION['error'] = "Ce post n'existe plus.";
+            $this->redirect('index.php');
+        }
+
+        // 2. Traitement d'un nouveau commentaire
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['commentaire'])) {
+            if (!$userId) $this->redirect('index.php?controller=Auth&action=login');
+            
+            $commentModel->addComment($userId, $postId, $_POST['commentaire']);
+            // Redirection pour nettoyer le flux POST (éviter le double envoi au refresh)
+            header("Location: index.php?controller=Post&action=show&id=$postId&sort=$sort");
+            exit;
+        }
+
+        // 3. Récupération des données associées
+        $stats = $voteModel->getPostStats($postId);
+        $myVote = $voteModel->getUserVote($userId, $postId);
+        $comments = $commentModel->getCommentsSorted($postId, $userId, $sort);
+
+        // 4. Affichage de la vue
+        $this->render('post/show', [
+            'post' => $post,
+            'stats' => $stats,
+            'myVote' => $myVote,
+            'comments' => $comments,
+            'currentSort' => $sort
+        ]);
+    }
+
     // Suppression
     public function delete() {
         if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) $this->redirect('index.php');
@@ -37,7 +84,7 @@ class PostController extends Controller {
         $this->render('post_edit', ['post' => $post]);
     }
 
-    // NOUVEAU : CRÉATION DEPUIS N'IMPORTE OÙ
+    // Création depuis n'importe où
     public function create() {
         if (!isset($_SESSION['user_id'])) $this->redirect('index.php');
 

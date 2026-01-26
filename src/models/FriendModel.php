@@ -6,7 +6,7 @@ class FriendModel extends Model {
 
     // Vérifie le statut (sont-ils amis ? demande en cours ?)
     public function getFriendshipStatus($me, $other) {
-        $sql = "SELECT statut, id_utilisateur1 FROM Ami 
+        $sql = "SELECT statut, id_utilisateur1 FROM ami 
                 WHERE (id_utilisateur1 = ? AND id_utilisateur2 = ?) 
                    OR (id_utilisateur1 = ? AND id_utilisateur2 = ?)";
         $stmt = $this->pdo->prepare($sql);
