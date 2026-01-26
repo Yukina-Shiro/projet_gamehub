@@ -28,6 +28,19 @@
 
         <button type="submit">Enregistrer les modifications</button>
     </form>
+
+    <form method="post" enctype="multipart/form-data">
+        <h3>Changer de mot de passe</h3>
+        <input type="hidden" name="action_type" value="update_password">
+
+        <label>Nouveau mot de passe</label>
+        <input type="password" name="mdp" required>
+
+        <label>Réecrire nouveau mot de passe</label>
+        <input type="password" name="mdp_confirm" required>
+
+        <button type="submit">Enregistrer les modifications</button>
+    </form>
     
     <div style="margin-top: 15px; text-align: center;">
         <a href="index.php?controller=User&action=profile" style="color: #666;">Annuler</a>
