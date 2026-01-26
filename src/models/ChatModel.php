@@ -13,7 +13,7 @@ class ChatModel extends Model {
     public function getConversation($user1, $user2) {
         $sql = "SELECT m.*, u.pseudo, u.photo_profil 
                 FROM Message m
-                JOIN Utilisateur u ON m.id_emetteur = u.id_utilisateur
+                JOIN utilisateur u ON m.id_emetteur = u.id_utilisateur
                 WHERE (id_emetteur = ? AND id_destinataire = ?) 
                    OR (id_emetteur = ? AND id_destinataire = ?)
                 ORDER BY date_envoi ASC";
@@ -25,7 +25,7 @@ class ChatModel extends Model {
     // Récupérer la liste des gens avec qui j'ai parlé (Mes conversations)
     public function getMyConversations($myId) {
         $sql = "SELECT DISTINCT u.id_utilisateur, u.pseudo, u.photo_profil
-                FROM Utilisateur u
+                FROM utilisateur u
                 JOIN Message m ON (u.id_utilisateur = m.id_emetteur OR u.id_utilisateur = m.id_destinataire)
                 WHERE (m.id_emetteur = ? OR m.id_destinataire = ?)
                 AND u.id_utilisateur != ?"; // On exclut mon propre ID
