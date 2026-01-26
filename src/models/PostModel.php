@@ -32,7 +32,7 @@ class PostModel extends Model {
         $sql = "SELECT p.*, u.pseudo, u.photo_profil
                 FROM post p
                 JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
-                WHERE ";
+                WHERE p.is_blocked = 0 AND";
 
         $conditions = [];
         $params = [];
