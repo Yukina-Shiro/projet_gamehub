@@ -20,6 +20,9 @@
     <p style="margin-top: 15px; text-align: center;">
         Pas encore de compte ? <a href="index.php?controller=Auth&action=register">Inscrivez-vous ici</a>
     </p>
+    <p style="margin-top: 15px; text-align: center;">
+        Mot de passe oublié ? <a href="index.php?controller=Auth&action=findPass">Réinitialisez-le ici</a>
+    </p>
 </div>
 
 <?php include 'views/layout/footer.php'; ?>
