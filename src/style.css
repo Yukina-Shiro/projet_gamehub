@@ -11,11 +11,18 @@
     --nav-bg: #ffffff;
     --input-bg: #ffffff;
     --header-shadow: rgba(0,0,0,0.05);
-    --logo-color: #6f42c1; /* Violet */
-    --brand-color: #6f42c1; /* Violet fixe (ne change pas en dark mode) */
+    
+    /* Couleurs de marque */
+    --logo-color: #6f42c1; /* Violet (Change en blanc en Dark Mode) */
+    --brand-color: #6f42c1; /* Violet fixe (Reste violet partout) */
+    
     --hover-bg: #f0f2f5;
+    
+    /* Chat */
     --chat-me: #007bff;
     --chat-other: #ffffff;
+    
+    /* États */
     --success: #28a745;
     --danger: #dc3545;
 }
@@ -30,24 +37,32 @@
     --nav-bg: #1e1e1e;
     --input-bg: #3a3b3c;
     --header-shadow: rgba(0,0,0,0.5);
-    --logo-color: #ffffff; /* Le logo devient blanc */
-    /* --brand-color reste violet pour les boutons */
+    
+    --logo-color: #ffffff; /* Logo devient blanc */
+    /* --brand-color reste #6f42c1 */
+    
     --hover-bg: #3a3b3c;
     --chat-me: #375a7f;
     --chat-other: #2c2c2c;
+    
     --success: #2ea043;
     --danger: #da3633;
 }
 
+/* =========================================
+   === STRUCTURE GLOBALE ===
+   ========================================= */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
     transition: background-color 0.3s, color 0.3s;
+    overflow-x: hidden; /* Évite le scroll horizontal */
 }
 
 a { color: inherit; text-decoration: none; }
+ul { list-style: none; padding: 0; margin: 0; }
 
 .container {
     max-width: 800px;
@@ -60,7 +75,9 @@ a { color: inherit; text-decoration: none; }
     border: 1px solid var(--border-color);
 }
 
-/* --- HEADER FIXE --- */
+/* =========================================
+   === HEADER (HAUT) ===
+   ========================================= */
 .top-header {
     position: fixed; top: 0; left: 0; width: 100%; height: 60px;
     background-color: var(--nav-bg);
@@ -69,115 +86,163 @@ a { color: inherit; text-decoration: none; }
     display: flex; justify-content: center;
     box-shadow: 0 2px 5px var(--header-shadow);
 }
+
 .header-centered-container {
-    width: 100%; max-width: 600px;
+    width: 100%; max-width: 800px; /* Plus large pour accueillir les onglets */
     display: flex; justify-content: space-between; align-items: center;
     padding: 0 20px; box-sizing: border-box;
 }
+
 .logo-link {
     font-size: 1.5rem; font-weight: bold;
     color: var(--logo-color);
     display: flex; align-items: center; gap: 10px;
 }
 
-/* --- MENU DÉROULANT --- */
+/* --- BARRE FLOTTANTE (2 BOUTONS SÉPARÉS) --- */
+.floating-tabs-container {
+    position: fixed;
+    top: 70px; 
+    left: 0; 
+    width: 100%;
+    z-index: 990;
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Espace entre les boutons */
+    pointer-events: none; /* Clic à travers le vide */
+}
+
+/* Le bouton individuel */
+.floating-tab {
+    /* CORRECTION TAILLE : On écrase le width:100% global des boutons */
+    width: auto !important; 
+    min-width: 120px; /* Une largeur mini pour que ce soit joli */
+    
+    padding: 8px 20px; 
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 25px; /* Plus arrondi */
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    pointer-events: auto; /* Réactive le clic */
+    
+    /* Transparence & Effet Verre */
+    background: rgba(255, 255, 255, 0.7); 
+    backdrop-filter: blur(10px); /* Flou derrière */
+    -webkit-backdrop-filter: blur(10px);
+    
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Mode Sombre : Transparence adaptée */
+[data-theme="dark"] .floating-tab {
+    background: rgba(40, 40, 40, 0.7);
+    border-color: rgba(255,255,255,0.1);
+    color: #ccc;
+}
+
+.floating-tab:hover {
+    background: var(--brand-color);
+    color: white;
+    transform: translateY(-2px); /* Petit effet de levée */
+}
+
+/* État Actif (Sélectionné) */
+.floating-tab.active {
+    background: var(--brand-color);
+    color: white;
+    border-color: var(--brand-color);
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
+    opacity: 1;
+}
+
+/* --- ONGLETS DANS LE HEADER (NOUVEAU) --- */
+.header-tabs {
+    display: flex;
+    gap: 15px;
+    height: 100%;
+    align-items: center;
+}
+
+.header-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0 10px;
+    height: 60px; /* Toute la hauteur du header */
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    width: auto;
+    border-radius: 0;
+}
+
+.header-tab:hover {
+    color: var(--brand-color);
+    background: transparent;
+}
+
+.header-tab.active {
+    color: var(--brand-color);
+    border-bottom: 3px solid var(--brand-color);
+}
+
+/* Responsive Logo text */
+@media (max-width: 600px) {
+    .logo-text { display: none; }
+    .header-tab { font-size: 0.9rem; padding: 0 8px; }
+}
+
+/* --- MENU UTILISATEUR (DROPDOWN) --- */
 .user-menu-container { position: relative; display: inline-block; }
+
 .header-user-avatar {
     width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
     cursor: pointer; border: 2px solid var(--border-color);
 }
+
 .dropdown-menu {
     display: none; position: absolute; right: 0; top: 50px;
     background-color: var(--card-bg);
     min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);
     border-radius: 8px; z-index: 2000; border: 1px solid var(--border-color);
 }
+
 .dropdown-menu.show { display: block; animation: fadeIn 0.2s; }
+
 .dropdown-item {
     color: var(--text-color); padding: 12px 16px; display: block;
     border-bottom: 1px solid var(--border-color);
 }
-button.vote_top{
-    background-color: #007bff;
-    color: white;
-    padding: 5px 5px;
-    border: none;
-    cursor: pointer;
-    margin-right: 5px;
-    max-width: 5%;
-    max-height: 5%;
-    border-radius: 8px;
-    text-align: center;
-}
-button.vote_flop{
-    background-color: #ff2200;
-    color: white;
-    padding: 5px 5px;
-    border: none;
-    cursor: pointer;
-    margin-right: 5px;
-    max-width: 5%;
-    max-height: 5%;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.alert {
-    color: red;
-    background: #ffdddd;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-left: 5px solid red;
-}
 .dropdown-item:hover { background-color: var(--hover-bg); }
 
-/* --- ONGLETS (FEED TABS) --- */
-.feed-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding-top: 10px;
-}
-.tab-link {
-    flex: 1;
-    max-width: 180px;
-    text-align: center;
-    padding: 10px 0;
-    color: var(--text-secondary);
-    font-weight: bold;
-    border-radius: 20px;
-    background-color: var(--card-bg); /* Fond normal */
-    border: 1px solid var(--border-color);
-    transition: all 0.2s;
-}
-.tab-link:hover {
-    background-color: var(--hover-bg);
-}
-/* CORRECTION: On utilise --brand-color (Violet) au lieu de --logo-color (qui devient blanc en dark mode) */
-.tab-link.active {
-    background-color: var(--brand-color) !important;
-    color: white !important;
-    border-color: var(--brand-color) !important;
-}
-.tab-link.active::after { content: none; }
-
-/* --- POSTS --- */
+/* =========================================
+   === FEED & POSTS ===
+   ========================================= */
 .post-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 12px; margin-bottom: 20px; padding: 15px;
     color: var(--text-color);
 }
+
 .post-header { display: flex; align-items: center; margin-bottom: 10px; }
+
 .post-avatar, .post-header img {
     width: 40px !important; height: 40px !important; min-width: 40px;
     border-radius: 50%; object-fit: cover; margin-right: 10px;
     border: 1px solid var(--border-color);
 }
+
 .post-content { color: var(--text-color); margin-bottom: 10px; line-height: 1.5; }
+
 .post-image-container { 
-    margin-bottom: 10px; display: flex; justify-content: center; background: var(--hover-bg); border-radius: 8px; overflow: hidden; 
+    margin-bottom: 10px; display: flex; justify-content: center; 
+    background: var(--hover-bg); border-radius: 8px; overflow: hidden; 
 }
 .post-image-container img.post-img-full { width: 100%; height: auto; display: block; }
 
@@ -197,7 +262,7 @@ button.vote_flop{
 .btn-like.active { color: #00ba7c !important; }
 .btn-dislike.active { color: #f91880 !important; }
 
-/* --- COMMENTAIRES --- */
+/* Commentaires */
 .comments-section {
     display: none; margin-top: 10px;
     background: var(--secondary-bg);
@@ -205,38 +270,85 @@ button.vote_flop{
 }
 .comment-item { border-bottom: 1px solid var(--border-color); padding: 8px 0; color: var(--text-color); }
 
-/* --- INPUTS --- */
+/* =========================================
+   === FILTRES (AJAX BAR) ===
+   ========================================= */
+.sub-filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--secondary-bg);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: -10px auto 20px auto; 
+    max-width: 600px;
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   === INPUTS & FORMULAIRES ===
+   ========================================= */
 input, textarea, select {
     background-color: var(--input-bg); color: var(--text-color);
     border: 1px solid var(--border-color);
     width: 100%; padding: 10px; margin: 5px 0 15px 0; border-radius: 5px; box-sizing: border-box;
 }
 
-/* --- BOTTOM NAV & FAB --- */
+/* Switch Dark Mode */
+.switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc; transition: .4s; border-radius: 34px;
+}
+.slider:before {
+    position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px;
+    background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--success); }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* =========================================
+   === FOOTER (BAS) & NAVIGATION ===
+   ========================================= */
 .bottom-nav {
     position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
     background-color: var(--nav-bg); border-top: 1px solid var(--border-color);
     display: flex; justify-content: space-around; align-items: center; z-index: 1000;
 }
+
 .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); width: 20%; font-size: 0.8rem; }
 .nav-item i { font-size: 1.6rem; margin-bottom: 4px; }
 .nav-item:hover, .nav-item.active { color: var(--brand-color); }
+
+.nav-badge { 
+    position: absolute; top: -5px; right: -8px; 
+    background: var(--danger); color: white; 
+    border-radius: 50%; padding: 2px 5px; 
+    font-size: 0.7rem; font-weight: bold; 
+}
+
+/* Bouton FAB Central (+) */
 .fab-center {
     width: 60px; height: 60px; border-radius: 50%;
     background: linear-gradient(135deg, #6f42c1, #8e44ad);
     color: white; border: 4px solid var(--bg-color);
-    font-size: 1.8rem; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; top: -25px;
+    font-size: 1.8rem; display: flex; justify-content: center; align-items: center; 
+    cursor: pointer; position: relative; top: -25px;
     box-shadow: 0 4px 10px rgba(111, 66, 193, 0.4);
 }
 
-/* --- FAQ / LISTES AMIS --- */
+/* =========================================
+   === PAGES DIVERSES (Profil, Liste, Chat) ===
+   ========================================= */
 details, .friend-block {
     background: var(--secondary-bg) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-color) !important;
     border-radius: 8px; padding: 20px; margin-bottom: 10px; min-width: 45%; flex: 1;
 }
-summary { color: var(--text-color); }
+summary { color: var(--text-color); cursor: pointer; font-weight: bold; }
 
 .generic-item {
     display: flex; align-items: center;
@@ -252,32 +364,26 @@ summary { color: var(--text-color); }
     border: 1px solid var(--border-color);
 }
 
-/* --- CHAT --- */
-.chat-bubble-me { background: var(--chat-me); color: white; }
-.chat-bubble-other { background: var(--secondary-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+/* Chat Bubbles */
+.chat-bubble-me { background: var(--chat-me); color: white; border-radius: 15px; padding: 10px; }
+.chat-bubble-other { background: var(--secondary-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 15px; padding: 10px; }
 
-/* --- SWITCH --- */
-.switch { position: relative; display: inline-block; width: 50px; height: 24px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc; transition: .4s; border-radius: 34px;
+/* =========================================
+   === MODALES (Partage, Création) ===
+   ========================================= */
+.modal-overlay { 
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background:rgba(0,0,0,0.5); z-index:2000; 
+    justify-content:center; align-items:center; 
 }
-.slider:before {
-    position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px;
-    background-color: white; transition: .4s; border-radius: 50%;
+
+.modal-content { 
+    background-color: var(--card-bg); color: var(--text-color); 
+    padding: 20px; border-radius: 12px; width: 90%; max-width:500px; 
+    text-align: center; border: 1px solid var(--border-color); 
 }
-input:checked + .slider { background-color: #28a745; }
-input:checked + .slider:before { transform: translateX(26px); }
 
-/* --- MODALES & PARTAGE --- */
-.modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
-.modal-content { background-color: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 12px; width: 90%; max-width:500px; text-align: center; border: 1px solid var(--border-color); }
-
-/* Bouton principal (Publier) */
-button { border-radius: 5px; padding: 10px; border: none; cursor: pointer; background: var(--success); color: white; width: 100%; }
-
-/* Boutons de PARTAGE (Spécifique pour éviter d'être vert) */
+/* Boutons de Partage (Liste propre) */
 .share-options button { 
     background-color: var(--card-bg); 
     color: var(--text-color); 
@@ -286,32 +392,32 @@ button { border-radius: 5px; padding: 10px; border: none; cursor: pointer; backg
     text-align: left; 
     padding: 15px; 
     margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    border-radius: 8px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1rem; border-radius: 8px; cursor: pointer;
 }
 .share-options button:hover { background-color: var(--hover-bg); }
 .share-options button i { font-size: 1.2rem; width: 25px; text-align: center; }
 
+/* Bouton Principal */
+button { border-radius: 5px; padding: 10px; border: none; cursor: pointer; background: var(--success); color: white; width: 100%; font-size: 1rem; }
+
 /* Bouton Annuler */
-.btn-cancel-modal { background-color: var(--hover-bg) !important; color: var(--text-color) !important; margin-top: 10px; border: 1px solid var(--border-color) !important; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-.btn-primary {
-    background-color: var(--brand-color);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-bottom: 15px;
+.btn-cancel-modal { 
+    background-color: var(--hover-bg) !important; 
+    color: var(--text-color) !important; 
+    margin-top: 10px; border: 1px solid var(--border-color) !important; 
 }
 
-.btn-primary:hover {
-    opacity: 0.9;
-    background-color: var(--brand-color);
+/* =========================================
+   === ANIMATIONS & HELPERS ===
+   ========================================= */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.fa-spin { animation: fa-spin 1s infinite linear; }
+@keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Helpers d'alerte */
+.alert {
+    color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;
+    padding: 10px; margin-bottom: 10px; border-radius: 5px;
 }

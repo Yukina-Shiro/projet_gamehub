@@ -26,25 +26,70 @@ class PostModel extends Model {
         return $stmt->fetchAll();
     }
 
-    // FIL PERSO : Masque les posts bloqués
-    public function getPersoFeed($myId) {
+    // --- FIL PERSO AVEC FILTRES AVANCÉS ---
+    public function getPersoFeed($myId, $sourceFilter = 'all', $specificDate = null) {
+        
         $sql = "SELECT p.*, u.pseudo, u.photo_profil
                 FROM post p
                 JOIN utilisateur u ON p.id_utilisateur = u.id_utilisateur
-                WHERE (
-                    p.id_utilisateur = ?
-                    OR p.id_utilisateur IN (
-                        SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
-                        UNION SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
-                    )
-                    OR p.id_utilisateur IN (
-                        SELECT suivi FROM relation WHERE suiveur = ?
-                    )
-                )
-                AND p.is_blocked = 0
-                ORDER BY p.date_creation DESC LIMIT 50";
+                WHERE ";
+
+        $conditions = [];
+        $params = [];
+
+        // 1. Toujours inclure MES posts
+        $myPostCondition = "p.id_utilisateur = ?";
+        
+        // 2. Gestion de la source (Qui ?)
+        if ($sourceFilter === 'amis') {
+            // Uniquement Amis (+ Moi)
+            $conditions[] = "($myPostCondition OR p.id_utilisateur IN (
+                SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
+                UNION 
+                SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+            ))";
+            $params[] = $myId; // Pour moi
+            $params[] = $myId; // Pour amis 1
+            $params[] = $myId; // Pour amis 2
+        } 
+        elseif ($sourceFilter === 'abo') {
+            // Uniquement Abonnements (+ Moi)
+            $conditions[] = "($myPostCondition OR p.id_utilisateur IN (
+                SELECT suivi FROM relation WHERE suiveur = ?
+            ))";
+            $params[] = $myId; // Pour moi
+            $params[] = $myId; // Pour abos
+        } 
+        else {
+            // Par défaut 'all' : Amis + Abonnements (+ Moi)
+            $conditions[] = "($myPostCondition OR p.id_utilisateur IN (
+                SELECT id_utilisateur1 FROM ami WHERE id_utilisateur2 = ? AND statut = 'valide'
+                UNION 
+                SELECT id_utilisateur2 FROM ami WHERE id_utilisateur1 = ? AND statut = 'valide'
+            ) OR p.id_utilisateur IN (
+                SELECT suivi FROM relation WHERE suiveur = ?
+            ))";
+            $params[] = $myId; // Pour moi
+            $params[] = $myId; // Pour amis 1
+            $params[] = $myId; // Pour amis 2
+            $params[] = $myId; // Pour abos
+        }
+
+        // 3. Gestion de la Date (Quand ?)
+        if (!empty($specificDate)) {
+            // On compare la partie DATE de la colonne datetime (YYYY-MM-DD)
+            $conditions[] = "DATE(p.date_creation) = ?";
+            $params[] = $specificDate;
+        }
+
+        // Assemblage
+        $sql .= implode(" AND ", $conditions);
+
+        // Tri par défaut (toujours du plus récent au plus vieux pour l'affichage)
+        $sql .= " ORDER BY p.date_creation DESC LIMIT 50";
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$myId, $myId, $myId, $myId]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
