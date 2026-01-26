@@ -59,5 +59,45 @@ class AuthController extends Controller {
         session_destroy();
         $this->redirect('index.php?controller=Auth&action=login');
     }
+       
+    public function findPass(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'] ?? '';
+            $userModel = new UserModel($this->pdo);
+            $user = $userModel->getByEmail($email);
+
+            if (!$user) {
+                $_SESSION['flash_error'] = 'Utilisateur introuvable.';
+                header('Location: index.php?controller=Auth&action=findPass');
+                exit;
+            }
+
+
+
+            require_once __DIR__ . '/../models/email.php';
+            $bytes = random_bytes(15);
+            $newPassword = bin2hex($bytes);
+
+            $userModel->updatePassword($user['email'], $newPassword);
+
+            $emailSent = sendLostPassword(
+                $user['email'],
+                $user['prenom'] . ' ' . $user['nom'],
+                $newPassword
+            );
+
+            if ($emailSent) {
+                $_SESSION['flash_success'] = 'Mot de passe envoyé à l\'utilisateur.';
+            } else {
+                $_SESSION['flash_warning'] = 'Mot de passe envoyé mais l\'email n\'a pas pu être envoyé.';
+            }
+
+            header('Location: index.php?controller=Auth&action=login');
+
+        } else {
+            $this->render('auth/findPassword');
+        }
+    }
 }
 ?>

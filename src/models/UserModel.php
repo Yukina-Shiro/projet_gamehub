@@ -48,6 +48,13 @@ class UserModel extends Model {
         }
     }
 
+    public function updatePassword($email, $newPassword) {
+        $sql = "UPDATE utilisateur SET mdp = ? WHERE email = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        return $stmt->execute([$hashedPassword, $email]);
+    }
+
     // Recherche d'utilisateurs par pseudo (partiel)
     public function searchUsers($query) {
         $sql = "SELECT id_utilisateur, pseudo, photo_profil, bio 
