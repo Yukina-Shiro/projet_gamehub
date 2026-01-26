@@ -4,14 +4,11 @@
  * Utilise sendmail (serveur IUT)
  */
 
-
 function sendMail($to, $subject, $messageBody, $from = null) {
 
     // Charger la configuration
-    $config = require __DIR__ . '/mail.php';
+    $config = require __DIR__ . '/MailModel.php';
     
-
-
     // Préparer les headers
     $fromEmail = $from ?? $config['from_email'];
     $headers = "MIME-Version: 1.0\r\n";

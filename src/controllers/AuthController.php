@@ -73,9 +73,7 @@ class AuthController extends Controller {
                 exit;
             }
 
-
-
-            require_once __DIR__ . '/../models/email.php';
+            require_once __DIR__ . '/../models/EmailModel.php';
             $bytes = random_bytes(15);
             $newPassword = bin2hex($bytes);
 
@@ -100,4 +98,5 @@ class AuthController extends Controller {
         }
     }
 }
+
 ?>

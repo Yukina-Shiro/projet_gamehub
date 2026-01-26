@@ -15,4 +15,5 @@ return [
     // Mode simulation (si true, les emails ne sont pas vraiment envoyés, juste loggés)
     'simulate' => false,
 ];
+
 ?>
