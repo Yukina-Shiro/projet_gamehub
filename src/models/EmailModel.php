@@ -53,4 +53,27 @@ function sendLostPassword($userEmail, $userName, $userPassword) {
     return sendMail($userEmail, $subject, $message);
 }
 
+function sendEmail($userEmail, $title, $content) {
+    $subject = $title;
+
+    $message = "<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+        <div style='background: #5a67d8; color: white; padding: 20px; border-radius: 8px 8px 0 0;'>
+            <h2 style='margin: 0;'>GameHub - $title</h2>
+        </div>
+        <div style='background: #f7fafc; padding: 20px; border-radius: 0 0 8px 8px;'>
+            <p>$content</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+    return sendMail($userEmail, $subject, $message);
+}
+
 ?>
