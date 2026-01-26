@@ -123,7 +123,7 @@
 </div>
 
 <script>
-    // --- NOUVEAU SCRIPT DE TRI AJAX ---
+    // --- SCRIPT DE TRI AJAX ---
     function sortComments(type) {
         const postId = document.getElementById('post_id').value;
         const container = document.getElementById('comments-container');

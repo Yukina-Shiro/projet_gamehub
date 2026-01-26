@@ -40,25 +40,21 @@ include 'views/layout/header.php';
     function switchFeed(type) {
         currentFilter = type;
 
-        // 1. CORRECTION COULEUR : On retire 'active' partout d'abord
         const allTabs = document.querySelectorAll('.floating-tab');
         allTabs.forEach(tab => {
             tab.classList.remove('active');
         });
 
-        // 2. On ajoute 'active' uniquement sur le bouton cliqué
         const activeTab = document.getElementById('tab-' + type);
         if (activeTab) {
             activeTab.classList.add('active');
         }
 
-        // 3. Afficher/Cacher la barre de filtres (Date/Source)
         const filterBar = document.getElementById('perso-filters');
         if (filterBar) {
             filterBar.style.display = (type === 'perso') ? 'flex' : 'none';
         }
 
-        // 4. Charger le contenu
         refreshFeed();
     }
 
