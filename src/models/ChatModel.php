@@ -4,7 +4,7 @@ require_once 'models/Model.php';
 class ChatModel extends Model {
     // Envoyer un message (texte ou partage de post)
     public function sendMessage($from, $to, $msg, $postId = null) {
-        $sql = "INSERT INTO Message (id_emetteur, id_destinataire, contenu, id_post_partage) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO message (id_emetteur, id_destinataire, contenu, id_post_partage) VALUES (?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$from, $to, $msg, $postId]);
     }
@@ -12,7 +12,7 @@ class ChatModel extends Model {
     // Récupérer la conversation entre deux personnes
     public function getConversation($user1, $user2) {
         $sql = "SELECT m.*, u.pseudo, u.photo_profil 
-                FROM Message m
+                FROM message m
                 JOIN utilisateur u ON m.id_emetteur = u.id_utilisateur
                 WHERE (id_emetteur = ? AND id_destinataire = ?) 
                    OR (id_emetteur = ? AND id_destinataire = ?)
@@ -26,7 +26,7 @@ class ChatModel extends Model {
     public function getMyConversations($myId) {
         $sql = "SELECT DISTINCT u.id_utilisateur, u.pseudo, u.photo_profil
                 FROM utilisateur u
-                JOIN Message m ON (u.id_utilisateur = m.id_emetteur OR u.id_utilisateur = m.id_destinataire)
+                JOIN message m ON (u.id_utilisateur = m.id_emetteur OR u.id_utilisateur = m.id_destinataire)
                 WHERE (m.id_emetteur = ? OR m.id_destinataire = ?)
                 AND u.id_utilisateur != ?"; // On exclut mon propre ID
         $stmt = $this->pdo->prepare($sql);
@@ -36,7 +36,7 @@ class ChatModel extends Model {
 
     // Compter les messages non lus (pour le badge rouge)
     public function countUnreadMessages($userId) {
-        $sql = "SELECT COUNT(*) FROM Message WHERE id_destinataire = ? AND lu = 0";
+        $sql = "SELECT COUNT(*) FROM message WHERE id_destinataire = ? AND lu = 0";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId]);
         return $stmt->fetchColumn();
@@ -44,7 +44,7 @@ class ChatModel extends Model {
 
     // Marquer les messages d'une conversation comme lus
     public function markAsRead($me, $otherId) {
-        $sql = "UPDATE Message SET lu = 1 WHERE id_destinataire = ? AND id_emetteur = ? AND lu = 0";
+        $sql = "UPDATE message SET lu = 1 WHERE id_destinataire = ? AND id_emetteur = ? AND lu = 0";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$me, $otherId]);
     }
