@@ -60,11 +60,12 @@ class AdminController extends Controller {
     }
 
     public function sendMassMail() {
+        require_once 'models/EmailModel.php';
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['emails'])) {
             $subject = $_POST['subject'];
             $message = $_POST['message'];
             foreach ($_POST['emails'] as $to) {
-                // mail($to, $subject, $message, "From: admin@gamehub.com"); // Décommenter sur un vrai serveur
+                sendEmail($to, $subject, $message);
             }
             $this->redirect('index.php?controller=Admin&action=dashboard&msg=success');
         }
