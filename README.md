@@ -60,6 +60,20 @@ chmod 755 uploads
 http://localhost/sae_s301_projet_gamehub/src/index.php
 ```
 
+### Comptes de démonstration
+
+Afin de faciliter les tests et la démonstration de l'application, des utilisateurs sont déjà présents dans la base de données.
+
+#### Compte Administrateur
+- **Email** : Admin@admin.com
+- **Mot de passe** : 1234
+- **Rôle** : Administrateur (accès au panneau d'administration)
+
+#### Compte Utilisateur (Lambda)
+- **Email** : Bapteve0524@gmail.com
+- **Mot de passe** : 1234
+- **Rôle** : Utilisateur standard
+
 ---
 
 ## ✨ Fonctionnalités principales
