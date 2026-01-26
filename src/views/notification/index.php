@@ -2,9 +2,10 @@
 
 <div class="container">
     <h2>🔔 Vos Notifications</h2>
-    <a href="index.php?controller=Notification&action=markAllRead" class="btn-primary" 
-    style="display: inline-block; text-decoration: none;">
-        Marquer tout comme vu
+    
+    <a href="index.php?controller=Notification&action=markAllRead" class="mark-read-btn" 
+       style="display: inline-block; text-decoration: none; margin-bottom:20px;">
+       <i class="fa-solid fa-check-double"></i> Marquer tout comme vu
     </a>
 
     <?php if (empty($notifs)): ?>
@@ -22,18 +23,7 @@
                             <div>
                                 <strong><?= htmlspecialchars($n['pseudo']) ?></strong> <?= $n['message'] ?>
                             </div>
-                            <small style="color:var(--text-secondary);"><?= $n['date_notif'] ?></small>
-                            
-                            <?php if ($n['type'] === 'demande_ami' && $n['statut_ami'] === 'attente'): ?>
-                                <div style="margin-top: 5px;">
-                                    <a href="index.php?controller=User&action=acceptFriend&id=<?= $n['id_emetteur'] ?>&fromNotif=1">
-                                        <button style="width: auto; padding: 5px 10px; font-size: 0.8em; background: var(--success);">Accepter</button>
-                                    </a>
-                                    <a href="index.php?controller=User&action=refuseRequest&id=<?= $n['id_emetteur'] ?>">
-                                        <button style="width: auto; padding: 5px 10px; font-size: 0.8em; background: var(--danger);">Refuser</button>
-                                    </a>
-                                </div>
-                            <?php endif; ?>
+                            <small style="color:var(--text-secondary); font-size:0.8em;"><?= $n['date_notif'] ?></small>
                         </div>
 
                         <div style="text-align: right; display: flex; align-items: center; gap: 10px;">

@@ -1,13 +1,23 @@
 <?php
-// Récupération Avatar
+// Récupération Avatar et Rôle
 $headerAvatar = 'https://via.placeholder.com/40'; 
+$isAdmin = false; // Par défaut
+
 if (isset($_SESSION['user_id'])) {
     if (!isset($pdo)) { global $pdo; }
-    $stmtH = $pdo->prepare("SELECT photo_profil FROM utilisateur WHERE id_utilisateur = ?");
+    // ON AJOUTE 'role' DANS LA REQUÊTE
+    $stmtH = $pdo->prepare("SELECT photo_profil, role FROM utilisateur WHERE id_utilisateur = ?");
     $stmtH->execute([$_SESSION['user_id']]);
     $resH = $stmtH->fetch();
-    if ($resH && !empty($resH['photo_profil']) && file_exists('uploads/' . $resH['photo_profil'])) {
-        $headerAvatar = 'uploads/' . $resH['photo_profil'];
+    
+    if ($resH) {
+        if (!empty($resH['photo_profil']) && file_exists('uploads/' . $resH['photo_profil'])) {
+            $headerAvatar = 'uploads/' . $resH['photo_profil'];
+        }
+        // Vérification du rôle
+        if ($resH['role'] === 'admin') {
+            $isAdmin = true;
+        }
     }
 }
 
@@ -43,13 +53,22 @@ if(empty($_GET)) $isHome = true;
                 <div class="user-menu-container">
                     <img src="<?= htmlspecialchars($headerAvatar) ?>" class="header-user-avatar" id="avatarBtn">
                     <div id="userDropdown" class="dropdown-menu">
+                        <?php if($isAdmin): ?>
+                            <a href="index.php?controller=Admin&action=dashboard" class="dropdown-item" style="color: var(--danger); font-weight:bold;">
+                                <i class="fa-solid fa-shield-halved"></i> Administration
+                            </a>
+                        <?php endif; ?>
+                        
                         <a href="index.php?controller=User&action=settings" class="dropdown-item"><i class="fa-solid fa-gear"></i> Paramètres</a>
                         <a href="index.php?controller=Home&action=faq" class="dropdown-item"><i class="fa-solid fa-circle-question"></i> FAQ</a>
                         <a href="index.php?controller=Auth&action=logout" class="dropdown-item logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
                     </div>
                 </div>
             <?php else: ?>
-                <a href="index.php?controller=Auth&action=login" style="margin-right: 10px; color: #6f42c1; font-weight:bold;">Connexion</a>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <a href="index.php?controller=Auth&action=login" style="color: var(--brand-color); font-weight:bold;">Connexion</a>
+                    <a href="index.php?controller=Auth&action=register" class="action-btn" style="background:var(--brand-color); color:white; padding:5px 15px; border-radius:15px; text-decoration:none;">Inscription</a>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -57,13 +76,8 @@ if(empty($_GET)) $isHome = true;
 
 <?php if($isHome && isset($_SESSION['user_id'])): ?>
     <div class="floating-tabs-container">
-        <button id="tab-global" class="floating-tab active" onclick="switchFeed('global')">
-            Global
-        </button>
-        
-        <button id="tab-perso" class="floating-tab" onclick="switchFeed('perso')">
-            Mon Fil
-        </button>
+        <button id="tab-global" class="floating-tab active" onclick="switchFeed('global')">Global</button>
+        <button id="tab-perso" class="floating-tab" onclick="switchFeed('perso')">Mon Fil</button>
     </div>
 <?php endif; ?>
 

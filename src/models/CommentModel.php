@@ -13,14 +13,25 @@ class CommentModel extends Model {
                 ) as is_friend
                 FROM commentaire c
                 JOIN utilisateur u ON c.id_utilisateur = u.id_utilisateur
-                WHERE c.id_post = :postId 
-                ORDER BY c.date_com DESC"; // Plus récents en premier
+                WHERE c.id_post = :postId ";
+
+        // --- LOGIQUE DE TRI DYNAMIQUE ---
+        if ($sort === 'old') {
+            // Plus anciens en premier
+            $sql .= "ORDER BY c.date_com ASC";
+        } elseif ($sort === 'new') {
+            // Plus récents en premier
+            $sql .= "ORDER BY c.date_com DESC";
+        } else {
+            // Pertinence : Amis d'abord, puis les plus récents
+            $sql .= "ORDER BY is_friend DESC, c.date_com DESC";
+        }
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['postId' => $postId, 'me' => $currentUserId]);
         return $stmt->fetchAll();
     }
-
-    // --- NOUVEAU : Récupérer UN SEUL commentaire complet par son ID ---
+    
     public function getCommentById($commentId) {
         $sql = "SELECT c.*, u.pseudo, u.photo_profil
                 FROM commentaire c
@@ -31,19 +42,18 @@ class CommentModel extends Model {
         return $stmt->fetch();
     }
 
-    // --- MODIFIÉ : Retourne maintenant l'ID inséré ---
     public function addComment($userId, $postId, $content, $voteSnapshot = 0) {
         $sql = "INSERT INTO commentaire (id_utilisateur, id_post, commentaire, vote_at_time, date_com) 
                 VALUES (?, ?, ?, ?, NOW())";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $postId, $content, $voteSnapshot]);
         
-        // On récupère l'ID du commentaire qu'on vient de créer
+        
         $newCommentId = $this->pdo->lastInsertId();
-
+        
         $this->notifyPostOwner($userId, $postId);
         
-        return $newCommentId; // On retourne cet ID
+        return $newCommentId;
     }
 
     private function notifyPostOwner($senderId, $postId) {

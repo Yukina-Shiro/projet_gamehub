@@ -13,7 +13,8 @@ class AdminController extends Controller {
         }
     }
 
-    public function index() {
+    // RENOMMÉ de index() à dashboard() pour correspondre au lien du header
+    public function dashboard() {
         // Point 1 : Filtrage par date d'inscription
         $date = $_GET['filter_date'] ?? null;
         $sql = "SELECT * FROM utilisateur";
@@ -39,7 +40,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    // NOUVEAU : Promouvoir ou rétrograder un utilisateur
+    // Promouvoir ou rétrograder un utilisateur
     public function toggleRole() {
         if (isset($_GET['id']) && $_GET['id'] != $_SESSION['user_id']) {
             $id = $_GET['id'];
@@ -55,7 +56,7 @@ class AdminController extends Controller {
                 $update->execute([$newRole, $id]);
             }
         }
-        $this->redirect('index.php?controller=Admin&action=index');
+        $this->redirect('index.php?controller=Admin&action=dashboard');
     }
 
     public function sendMassMail() {
@@ -63,9 +64,9 @@ class AdminController extends Controller {
             $subject = $_POST['subject'];
             $message = $_POST['message'];
             foreach ($_POST['emails'] as $to) {
-                mail($to, $subject, $message, "From: admin@gamehub.com");
+                // mail($to, $subject, $message, "From: admin@gamehub.com"); // Décommenter sur un vrai serveur
             }
-            $this->redirect('index.php?controller=Admin&action=index&msg=success');
+            $this->redirect('index.php?controller=Admin&action=dashboard&msg=success');
         }
     }
 
@@ -76,14 +77,14 @@ class AdminController extends Controller {
             $newStatus = ($post['is_blocked'] == 1) ? 0 : 1;
             $postModel->toggleBlock($_GET['id'], $newStatus);
         }
-        $this->redirect('index.php?controller=Admin&action=index');
+        $this->redirect('index.php?controller=Admin&action=dashboard');
     }
 
     public function banUser() {
         if (isset($_GET['id']) && $_GET['id'] != $_SESSION['user_id']) {
             $this->pdo->prepare("DELETE FROM utilisateur WHERE id_utilisateur = ?")->execute([$_GET['id']]);
         }
-        $this->redirect('index.php?controller=Admin&action=index');
+        $this->redirect('index.php?controller=Admin&action=dashboard');
     }
 
     public function deletePost() {
@@ -91,6 +92,6 @@ class AdminController extends Controller {
             $postModel = new PostModel($this->pdo);
             $postModel->deletePost($_GET['id']);
         }
-        $this->redirect('index.php?controller=Admin&action=index');
+        $this->redirect('index.php?controller=Admin&action=dashboard');
     }
 }

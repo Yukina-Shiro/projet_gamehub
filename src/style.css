@@ -421,3 +421,32 @@ button { border-radius: 5px; padding: 10px; border: none; cursor: pointer; backg
     color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;
     padding: 10px; margin-bottom: 10px; border-radius: 5px;
 }
+
+/* --- BOUTON NOTIFICATION STYLE PILULE --- */
+.mark-read-btn {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg); /* Fond couleur carte */
+    color: var(--text-secondary);
+    padding: 10px 0;
+    border-radius: 50px; /* Bords très ronds (pilule) */
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.mark-read-btn:hover {
+    background-color: var(--brand-color); /* Devient violet au survol */
+    color: white;
+    border-color: var(--brand-color);
+    transform: translateY(-2px); /* Petit effet de levier */
+    box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+}
+
+.mark-read-btn i {
+    margin-right: 8px;
+}

@@ -60,12 +60,35 @@
         </form>
     </div>
 
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:0 5px;">
+        <span style="font-weight:bold; color:var(--text-color);">
+            <span id="display-count"><?= count($comments) ?></span> Commentaire(s)
+        </span>
+        <div style="font-size:0.9em;" id="sort-links">
+            <span style="color:var(--text-secondary);">Trier par : </span>
+            
+            <span onclick="sortComments('pertinence')" class="sort-link active" data-sort="pertinence"
+               style="cursor:pointer; margin-left:5px; color: var(--brand-color); font-weight: bold;">
+               Pertinence
+            </span> | 
+            
+            <span onclick="sortComments('new')" class="sort-link" data-sort="new"
+               style="cursor:pointer; color: var(--text-secondary);">
+               Récents
+            </span> | 
+            
+            <span onclick="sortComments('old')" class="sort-link" data-sort="old"
+               style="cursor:pointer; color: var(--text-secondary);">
+               Anciens
+            </span>
+        </div>
+    </div>
+    
     <div class="comments-list-wrapper" id="comments-container">
         <?php if(empty($comments)): ?>
             <p id="no-comment-msg" style="text-align:center; color:var(--text-secondary); margin-top:20px;">Soyez le premier à commenter !</p>
         <?php else: ?>
             <?php foreach($comments as $com): ?>
-                
                 <div class="generic-item" style="align-items: flex-start; margin-bottom: 10px; cursor: default;">
                     <a href="index.php?controller=User&action=profile&id=<?= $com['id_utilisateur'] ?>">
                         <img src="<?= !empty($com['photo_profil']) ? 'uploads/'.$com['photo_profil'] : 'https://via.placeholder.com/40' ?>" 
@@ -75,7 +98,6 @@
                         <div style="display:flex; justify-content:space-between; align-items: center;">
                             <div>
                                 <strong><?= htmlspecialchars($com['pseudo']) ?></strong>
-                                
                                 <?php if(isset($com['vote_at_time']) && $com['vote_at_time'] != 0): ?>
                                     <?php if($com['vote_at_time'] == 1): ?>
                                         <span style="color: var(--success); font-size: 0.8em; margin-left: 5px; background: rgba(40, 167, 69, 0.1); padding: 2px 6px; border-radius: 4px;">
@@ -94,14 +116,46 @@
                             <?= nl2br(htmlspecialchars($com['commentaire'])) ?>
                         </p>
                     </div>
-                    
                 </div>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
         <?php endif; ?>
     </div>
 </div>
 
 <script>
+    // --- NOUVEAU SCRIPT DE TRI AJAX ---
+    function sortComments(type) {
+        const postId = document.getElementById('post_id').value;
+        const container = document.getElementById('comments-container');
+        
+        // 1. Mise à jour visuelle des liens
+        document.querySelectorAll('.sort-link').forEach(el => {
+            el.style.color = 'var(--text-secondary)';
+            el.style.fontWeight = 'normal';
+            el.classList.remove('active');
+        });
+        const activeLink = document.querySelector(`.sort-link[data-sort="${type}"]`);
+        if(activeLink) {
+            activeLink.style.color = 'var(--brand-color)';
+            activeLink.style.fontWeight = 'bold';
+            activeLink.classList.add('active');
+        }
+
+        // 2. Opacité pour montrer le chargement
+        container.style.opacity = '0.5';
+
+        // 3. Appel AJAX
+        fetch(`index.php?controller=Post&action=reloadCommentsAjax&id=${postId}&sort=${type}`)
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                container.innerHTML = data.html;
+            }
+            container.style.opacity = '1';
+        });
+    }
+
+
     document.getElementById('comment-form').addEventListener('submit', function(e) {
         e.preventDefault(); 
         const input = document.getElementById('comment_input');
@@ -130,11 +184,9 @@
                 if(noComMsg) noComMsg.remove();
 
                 const container = document.getElementById('comments-container');
-                container.insertAdjacentHTML('afterbegin', data.html); // On injecte le HTML reçu
+                container.insertAdjacentHTML('afterbegin', data.html); 
                 
-                // Petit effet d'apparition
                 const newCom = container.firstChild;
-                // Si newCom est un noeud texte (espace), on prend le suivant
                 const el = (newCom.nodeType === 1) ? newCom : newCom.nextSibling;
                 if(el) {
                     el.style.opacity = '0';
@@ -143,7 +195,11 @@
                 }
 
                 const countSpan = document.getElementById('global-comment-count');
-                countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                const displayCount = document.getElementById('display-count');
+                const newCount = parseInt(countSpan.innerText) + 1;
+                countSpan.innerText = newCount;
+                if(displayCount) displayCount.innerText = newCount;
+                
             } else {
                 alert("Erreur : " + data.message);
             }
