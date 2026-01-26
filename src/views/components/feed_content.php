@@ -1,8 +1,3 @@
-<?php 
-// Ce fichier sert uniquement à afficher la liste des posts (utilisé par Home et par AJAX)
-// On suppose que $posts, $voteModel, $commentModel sont disponibles
-?>
-
 <?php if(empty($posts)): ?>
     <div style="text-align:center; margin-top:50px; color:var(--text-secondary);">
         <i class="fa-solid fa-ghost" style="font-size:2rem; margin-bottom:10px;"></i><br>
@@ -12,11 +7,8 @@
 <?php else: ?>
     <?php foreach($posts as $post): ?>
         <?php
-            // On récupère les stats pour chaque post (si ce n'est pas déjà fait par le contrôleur)
-            // Note: En optimisation pro, on ferait ça dans le modèle en une seule requête, mais ici on garde ta logique.
             $stats = $voteModel->getPostStats($post['id_post']);
             $myVote = $voteModel->getUserVote($_SESSION['user_id'], $post['id_post']);
-            // On ne charge pas les commentaires par défaut pour alléger, on laisse le clic le faire ou on met 0
             $nbComs = $stats['nb_comments'];
         ?>
         <div class="post-card" id="post-<?= $post['id_post'] ?>">
@@ -53,24 +45,15 @@
                     <button class="action-btn btn-dislike <?= $myVote == -1 ? 'active' : '' ?>" onclick="voteAjax(<?= $post['id_post'] ?>, -1)">
                         <i class="fa-solid fa-thumbs-down"></i> <span class="count-dislike-<?= $post['id_post'] ?>"><?= $stats['nb_dislikes'] ?></span>
                     </button>
-                    <button class="action-btn btn-comment" onclick="toggleComments(<?= $post['id_post'] ?>)">
+                    
+                    <a href="index.php?controller=Post&action=show&id=<?= $post['id_post'] ?>" class="action-btn btn-comment" style="text-decoration:none;">
                         <i class="fa-solid fa-comment"></i> <span><?= $nbComs ?></span>
-                    </button>
+                    </a>
                 </div>
                 <div class="post-actions-right">
                     <button class="action-btn btn-share" onclick="openShareModal(<?= $post['id_post'] ?>)"><i class="fa-solid fa-share"></i></button>
                 </div>
             </div>
-
-            <div id="comments-<?= $post['id_post'] ?>" class="comments-section">
-                <p style="text-align:center; color:gray; font-size:0.8em;">
-                    <a href="index.php?controller=Post&action=show&id=<?= $post['id_post'] ?>">Voir les commentaires en détail</a>
-                </p>
-                <form action="index.php?controller=Post&action=show&id=<?= $post['id_post'] ?>" method="post" class="comment-input-area">
-                    <input type="text" name="commentaire" class="comment-input" placeholder="Écrire un commentaire..." required>
-                    <button type="submit" style="width: auto; padding: 5px 15px;">➤</button>
-                </form>
             </div>
-        </div>
     <?php endforeach; ?>
 <?php endif; ?>

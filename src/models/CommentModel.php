@@ -1,68 +1,61 @@
 <?php
 require_once 'models/Model.php';
-require_once 'models/NotificationModel.php';
 
 class CommentModel extends Model {
 
-    public function addComment($userId, $postId, $text) {
-        $sql = "INSERT INTO commentaire (id_utilisateur, id_post, commentaire) VALUES (?, ?, ?)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$userId, $postId, $text]);
-
-        // Notification
-        $stmtPost = $this->pdo->prepare("SELECT id_utilisateur FROM post WHERE id_post = ?");
-        $stmtPost->execute([$postId]);
-        $authorId = $stmtPost->fetchColumn();
-
-        if ($authorId != $userId) {
-            $notif = new NotificationModel($this->pdo);
-            $notif->add($authorId, $userId, 'comment', "a commenté votre post.");
-        }
-    }
-
-    // L'ALGORITHME DE TRI INTELLIGENT
-    public function getCommentsSorted($postId, $viewerId, $sortType = 'pertinence') {
-        // On récupère d'abord le vote du visiteur pour savoir ce qu'il préfère
-        $stmtVote = $this->pdo->prepare("SELECT vote FROM vote WHERE id_utilisateur = ? AND id_post = ?");
-        $stmtVote->execute([$viewerId, $postId]);
-        $myVote = $stmtVote->fetchColumn(); // 1, -1 ou false
-
-        // La requête de base récupère le commentaire + infos user + si c'est un ami + le vote de l'auteur du commentaire
-        $sql = "SELECT c.*, u.pseudo, u.photo_profil,
-                (SELECT vote FROM vote WHERE id_utilisateur = c.id_utilisateur AND id_post = c.id_post) as author_vote,
-                (SELECT COUNT(*) FROM ami WHERE (id_utilisateur1 = :me AND id_utilisateur2 = c.id_utilisateur) OR (id_utilisateur1 = c.id_utilisateur AND id_utilisateur2 = :me)) as is_friend
+    public function getCommentsSorted($postId, $currentUserId, $sort = 'pertinence') {
+        $sql = "SELECT c.*, u.pseudo, u.photo_profil, 
+                (SELECT COUNT(*) FROM ami a WHERE 
+                    (a.id_utilisateur1 = :me AND a.id_utilisateur2 = c.id_utilisateur) 
+                    OR 
+                    (a.id_utilisateur1 = c.id_utilisateur AND a.id_utilisateur2 = :me)
+                    AND a.statut = 'valide'
+                ) as is_friend
                 FROM commentaire c
                 JOIN utilisateur u ON c.id_utilisateur = u.id_utilisateur
-                WHERE c.id_post = :postid ";
-
-        // Gestion des tris
-        if ($sortType === 'recent') {
-            $sql .= "ORDER BY c.date_com DESC";
-        } 
-        elseif ($sortType === 'old') {
-            $sql .= "ORDER BY c.date_com ASC";
-        }
-        elseif ($sortType === 'pertinence') {
-            // 1. D'abord les amis (is_friend DESC)
-            // 2. Ensuite ceux qui ont voté comme moi (Si j'ai liké, je veux voir les likers)
-            
-            $sql .= "ORDER BY is_friend DESC, ";
-            
-            if ($myVote == 1) {
-                // Je like : je veux voir les votes positifs (1) en premier
-                $sql .= "author_vote DESC, c.date_com DESC"; 
-            } elseif ($myVote == -1) {
-                // Je dislike : je veux voir les votes négatifs (-1) en premier
-                $sql .= "author_vote ASC, c.date_com DESC";
-            } else {
-                // Je suis neutre : tri par date classique
-                $sql .= "c.date_com DESC";
-            }
-        }
-
+                WHERE c.id_post = :postId 
+                ORDER BY c.date_com DESC"; // Plus récents en premier
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':me' => $viewerId, ':postid' => $postId]);
+        $stmt->execute(['postId' => $postId, 'me' => $currentUserId]);
         return $stmt->fetchAll();
+    }
+
+    // --- NOUVEAU : Récupérer UN SEUL commentaire complet par son ID ---
+    public function getCommentById($commentId) {
+        $sql = "SELECT c.*, u.pseudo, u.photo_profil
+                FROM commentaire c
+                JOIN utilisateur u ON c.id_utilisateur = u.id_utilisateur
+                WHERE c.id_commentaire = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$commentId]);
+        return $stmt->fetch();
+    }
+
+    // --- MODIFIÉ : Retourne maintenant l'ID inséré ---
+    public function addComment($userId, $postId, $content, $voteSnapshot = 0) {
+        $sql = "INSERT INTO commentaire (id_utilisateur, id_post, commentaire, vote_at_time, date_com) 
+                VALUES (?, ?, ?, ?, NOW())";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$userId, $postId, $content, $voteSnapshot]);
+        
+        // On récupère l'ID du commentaire qu'on vient de créer
+        $newCommentId = $this->pdo->lastInsertId();
+
+        $this->notifyPostOwner($userId, $postId);
+        
+        return $newCommentId; // On retourne cet ID
+    }
+
+    private function notifyPostOwner($senderId, $postId) {
+        $stmt = $this->pdo->prepare("SELECT id_utilisateur FROM post WHERE id_post = ?");
+        $stmt->execute([$postId]);
+        $post = $stmt->fetch();
+        if ($post && $post['id_utilisateur'] != $senderId) {
+            $msg = "a commenté votre publication.";
+            $sqlNotif = "INSERT INTO notification (id_destinataire, id_emetteur, type, message, date_notif) VALUES (?, ?, 'comment', ?, NOW())";
+            $stmtNotif = $this->pdo->prepare($sqlNotif);
+            $stmtNotif->execute([$post['id_utilisateur'], $senderId, $msg]);
+        }
     }
 }
 
