@@ -1,4 +1,5 @@
 <?php
+
 require_once 'controllers/Controller.php';
 require_once 'models/PostModel.php';
 require_once 'models/VoteModel.php';
