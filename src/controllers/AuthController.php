@@ -78,9 +78,13 @@ class AuthController extends Controller {
             $newPassword = bin2hex($bytes);
 
             $userModel->updatePassword($user['email'], $newPassword);
+            $emailSent = $user['email'];
+            if ($user['email_secours']) {
+                $emailSent=$user['email_secours'];
+            }
 
             $emailSent = sendLostPassword(
-                $user['email'],
+                $emailSent,
                 $user['prenom'] . ' ' . $user['nom'],
                 $newPassword
             );

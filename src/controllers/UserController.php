@@ -112,6 +112,18 @@ class UserController extends Controller {
         $user = $userModel->getById($_SESSION['user_id']);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($_POST['action_type'] === 'update_password') {
+                if (empty($_POST['mdp_confirm']) || empty($_POST['mdp'])) {
+                    $this->render('user/edit', ['user' => $user, 'error' => 'Veuillez remplir tous les champs du mot de passe.']);
+                    return;
+                }
+                if ($_POST['mdp'] !== $_POST['mdp_confirm']) {
+                    $this->render('user/edit', ['user' => $user, 'error' => 'Les mots de passe ne correspondent pas.']);
+                    return;
+                }
+                $userModel->updatePassword($user['email'], $_POST['mdp']);
+                $this->redirect('index.php?controller=User&action=profile');
+            } else {
             // (Le code d'update profil reste le même que la dernière fois)
             $pseudo = $_POST['pseudo']; $nom = $_POST['nom']; $prenom = $_POST['prenom']; $bio = $_POST['bio']; $photoName = null;
             if (isset($_FILES['photo_profil']) && $_FILES['photo_profil']['error'] === 0) {
@@ -130,6 +142,7 @@ class UserController extends Controller {
             $userModel->updateUser($_SESSION['user_id'], $pseudo, $bio, $nom, $prenom, $photoName);
             $_SESSION['pseudo'] = $pseudo;
             $this->redirect('index.php?controller=User&action=profile');
+            }
         }
 
         $this->render('user/edit', ['user' => $user]);

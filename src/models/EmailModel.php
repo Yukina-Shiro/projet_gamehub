@@ -36,7 +36,7 @@ function sendLostPassword($userEmail, $userName, $userPassword) {
 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
         <div style='background: #5a67d8; color: white; padding: 20px; border-radius: 8px 8px 0 0;'>
-            <h2 style='margin: 0;'>Médiathèque Jimna - Demande de remboursement</h2>
+            <h2 style='margin: 0;'>GameHub - Mot de passe oublié</h2>
         </div>
         <div style='background: #f7fafc; padding: 20px; border-radius: 0 0 8px 8px;'>
             <p>Bonjour $userName,</p>
