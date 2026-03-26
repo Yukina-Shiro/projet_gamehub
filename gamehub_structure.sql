@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 26 jan. 2026 à 10:40
+-- Généré le : jeu. 26 mars 2026 à 21:38
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `gj402456_game_hub`
+-- Base de données : `gamehub_db`
 --
 
 -- --------------------------------------------------------
@@ -38,8 +38,7 @@ CREATE TABLE `ami` (
 --
 
 INSERT INTO `ami` (`id_utilisateur1`, `id_utilisateur2`, `statut`) VALUES
-(4, 5, 'valide'),
-(6, 4, 'valide');
+(1, 2, 'valide');
 
 -- --------------------------------------------------------
 
@@ -54,18 +53,6 @@ CREATE TABLE `commentaire` (
   `commentaire` text DEFAULT NULL,
   `date_com` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `commentaire`
---
-
-INSERT INTO `commentaire` (`id_commentaire`, `id_utilisateur`, `id_post`, `commentaire`, `date_com`) VALUES
-(1, 6, 10, 'ahahah trop drôle ce mec', '2026-01-24 19:54:30'),
-(2, 5, 10, 'moé bof', '2026-01-24 19:55:40'),
-(3, 4, 10, 'bof bof tout ça', '2026-01-24 19:56:27'),
-(4, 5, 8, 'bite', '2026-01-25 18:06:38'),
-(5, 5, 8, '1', '2026-01-25 18:07:01'),
-(6, 8, 8, 'c moi le padreeeee', '2026-01-26 10:30:21');
 
 -- --------------------------------------------------------
 
@@ -88,9 +75,10 @@ CREATE TABLE `message` (
 --
 
 INSERT INTO `message` (`id_message`, `id_emetteur`, `id_destinataire`, `contenu`, `id_post_partage`, `date_envoi`, `lu`) VALUES
-(1, 4, 5, 'Regarde ce post !', 10, '2026-01-24 21:39:11', 1),
-(2, 4, 5, 'wsh', NULL, '2026-01-25 05:38:46', 1),
-(3, 5, 4, 'wsh', NULL, '2026-01-25 05:49:54', 0);
+(1, 2, 1, 'Salut !', NULL, '2026-03-26 19:49:03', 1),
+(2, 1, 2, 'Helloo !', NULL, '2026-03-26 19:49:31', 1),
+(5, 2, 1, 'Je vais jouer à Hollow Knight en live, tu veux passer voir ?', NULL, '2026-03-26 19:52:06', 1),
+(6, 1, 2, 'Avec plaisir !', NULL, '2026-03-26 19:52:23', 0);
 
 -- --------------------------------------------------------
 
@@ -107,34 +95,6 @@ CREATE TABLE `notification` (
   `lu` tinyint(1) DEFAULT 0,
   `date_notif` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `notification`
---
-
-INSERT INTO `notification` (`id_notif`, `id_destinataire`, `id_emetteur`, `type`, `message`, `lu`, `date_notif`) VALUES
-(2, 4, 5, 'accept_ami', 'a accepté votre demande d\'ami.', 1, '2026-01-24 17:32:17'),
-(3, 4, 5, 'follow', 'a commencé à vous suivre.', 1, '2026-01-24 17:32:44'),
-(4, 5, 4, 'follow', 'a commencé à vous suivre.', 1, '2026-01-24 17:33:08'),
-(6, 4, 5, 'accept_ami', 'a accepté votre demande d\'ami.', 1, '2026-01-24 17:52:09'),
-(8, 4, 6, 'demande_ami', 'veut être votre ami.', 1, '2026-01-24 18:16:48'),
-(9, 4, 6, 'follow', 'a commencé à vous suivre.', 1, '2026-01-24 18:16:50'),
-(10, 6, 4, 'accept_ami', 'a accepté votre demande d\'ami.', 1, '2026-01-24 18:17:11'),
-(11, 6, 4, 'new_post', 'a publié un nouveau post !', 1, '2026-01-24 18:17:53'),
-(12, 5, 4, 'new_post', 'a publié un nouveau post !', 1, '2026-01-24 18:17:53'),
-(15, 6, 5, 'refus_ami', 'a refusé votre demande d\'ami.', 1, '2026-01-24 18:33:35'),
-(16, 5, 6, 'vote', 'a liké votre post.', 1, '2026-01-24 19:53:49'),
-(17, 5, 6, 'comment', 'a commenté votre post.', 1, '2026-01-24 19:54:30'),
-(18, 5, 4, 'vote', 'a disliké votre post.', 1, '2026-01-24 19:56:13'),
-(19, 5, 4, 'comment', 'a commenté votre post.', 1, '2026-01-24 19:56:27'),
-(21, 4, 5, 'new_post', 'a publié un nouveau post !', 1, '2026-01-24 21:52:14'),
-(22, 5, 4, 'vote', 'a liké votre post.', 1, '2026-01-25 05:47:34'),
-(23, 5, 4, 'vote', 'a disliké votre post.', 1, '2026-01-25 05:47:35'),
-(24, 6, 5, 'comment', 'a commenté votre post.', 0, '2026-01-25 18:06:38'),
-(25, 6, 5, 'comment', 'a commenté votre post.', 0, '2026-01-25 18:07:01'),
-(26, 4, 8, 'vote', 'a liké votre post.', 0, '2026-01-26 10:30:01'),
-(27, 6, 8, 'vote', 'a liké votre post.', 0, '2026-01-26 10:30:05'),
-(28, 6, 8, 'comment', 'a commenté votre post.', 0, '2026-01-26 10:30:21');
 
 -- --------------------------------------------------------
 
@@ -158,16 +118,7 @@ CREATE TABLE `post` (
 --
 
 INSERT INTO `post` (`id_post`, `id_utilisateur`, `statut`, `titre`, `description`, `photo`, `date_creation`, `is_blocked`) VALUES
-(3, 5, 'public', 'Zelda', 'Le perso principale qui tape avec une épée Link la franchement il est nul il parle même pas', NULL, '2026-01-24 15:55:42', 0),
-(4, 4, 'public', 'Mathias', 'Il est bg ce mec hein', '6974e684770d3.png', '2026-01-24 16:34:28', 0),
-(6, 4, 'public', 'yo', 'yo', '6974eadb765ee.png', '2026-01-24 16:52:59', 0),
-(7, 5, 'ami', 'ozeihf', 'efizio', NULL, '2026-01-24 17:33:55', 0),
-(8, 6, 'public', 'bite', 'pipi', 'post_6_1769274954.jpg', '2026-01-24 18:15:54', 0),
-(9, 4, 'public', 'efo', 'oui', NULL, '2026-01-24 18:17:53', 0),
-(10, 5, 'public', 'azdaz', 'dzad', NULL, '2026-01-24 18:18:41', 0),
-(11, 5, 'public', 'aa', 'aa', NULL, '2026-01-24 21:52:10', 0),
-(12, 5, 'public', 'bb', 'aa', NULL, '2026-01-24 21:52:14', 0),
-(13, 8, 'public', 'oui', 'oui2', 'post_8_1769419865.jpg', '2026-01-26 10:31:05', 0);
+(1, 2, 'public', 'Silksong aux Game Awards', 'Hollow Knight Silksong aurait dû être jeu de l\'année ! Heureusement qu\'il a gagné le prix du meilleur jeu indé, il le mérite.', 'post_2_1774550416.jpg', '2026-03-26 19:40:16', 0);
 
 -- --------------------------------------------------------
 
@@ -185,9 +136,8 @@ CREATE TABLE `relation` (
 --
 
 INSERT INTO `relation` (`suiveur`, `suivi`) VALUES
-(4, 5),
-(5, 4),
-(6, 4);
+(1, 2),
+(2, 1);
 
 -- --------------------------------------------------------
 
@@ -217,12 +167,8 @@ CREATE TABLE `utilisateur` (
 --
 
 INSERT INTO `utilisateur` (`id_utilisateur`, `pseudo`, `bio`, `mdp`, `email`, `tel`, `date_creation`, `date_naissance`, `nom`, `prenom`, `photo_profil`, `adresse`, `role`, `email_de_secours`) VALUES
-(3, 'Dondon', NULL, '$2y$10$MWaE.izADeBx4GRv0SUY9uJ6S.Mjjp7iRNvj08lh2NE', 'Dondon@test.com', NULL, '2026-01-24 14:24:13', '2006-03-20', 'Donzion', 'Nathan', NULL, NULL, 'user', NULL),
-(4, 'Girl Power', 'ehifezioo', '$2y$10$W0M5OnGKFQ425qtPPkjTnOvFcJLsS7S4dz286NLtB/ncLFNpY.k4C', 'Enora@test.com', NULL, '2026-01-24 14:29:49', '2005-01-01', 'Saunier', 'Enora', 'profil_4_6974eac58575f.png', NULL, 'admin', NULL),
-(5, 'Kake', '', '$2y$10$gweyQs.UuQik/bvJlD92heTedKlQxFZEB.gjdQv0wKaK5w/r/Scy.', 'Kake@test.com', NULL, '2026-01-24 14:54:37', '2005-10-05', 'Millot', 'Baptiste', 'profil_5_1769273562.jpg', NULL, 'user', NULL),
-(6, 'Gemini', NULL, '$2y$10$HnUAZEs1F57ZAt2oxlGwNOw42cfMT.ZFIgVR70bvsa51vbrJjTLBi', 'Gemini@test.com', NULL, '2026-01-24 16:34:42', '2002-02-02', 'Garcia', 'Jimmy', NULL, NULL, 'user', NULL),
-(7, 'nono', NULL, '$2y$10$BG3hmrX/xvoZQQE3syI65O46QBrfRtLGSOzhGSlPGyAgP9Y8yHyq.', 'nono@test.com', NULL, '2026-01-25 14:21:45', '2001-01-01', 'nono', 'nono', NULL, NULL, 'user', NULL),
-(8, 'caca', NULL, '$2y$10$BUmRmo0jYstMaDB/v5Y4qOOMAlKQUAfgPKisTHNRRb2NdxY71ryyq', 'redahalim06@gmail.com', 744853693, '2026-01-26 09:29:40', '2005-04-28', 'payan', 'tom', NULL, NULL, 'user', NULL);
+(1, 'Admin', 'Je suis un modérateur ! \r\nEnvoyer moi un message si vous avez une question sur GameHub !', '$2y$10$W0M5OnGKFQ425qtPPkjTnOvFcJLsS7S4dz286NLtB/ncLFNpY.k4C', 'Admin@admin.com', NULL, '2026-03-26 18:30:18', '1995-01-01', 'System', 'Admin', 'profil_1_1774550070.jpg', NULL, 'admin', NULL),
+(2, 'Gamer06', 'Streamer dans mon temps libre !\r\nJ\'aime les jeux indés et Nintendo', '$2y$10$W0M5OnGKFQ425qtPPkjTnOvFcJLsS7S4dz286NLtB/ncLFNpY.k4C', 'gamer06@test.com', NULL, '2026-03-26 18:30:18', '2005-06-15', 'Kinger', 'Queenie', 'profil_2_1774550319.jpg', NULL, 'user', NULL);
 
 -- --------------------------------------------------------
 
@@ -241,11 +187,7 @@ CREATE TABLE `vote` (
 --
 
 INSERT INTO `vote` (`id_utilisateur`, `id_post`, `vote`) VALUES
-(4, 10, -1),
-(5, 10, 1),
-(6, 10, 1),
-(8, 6, 1),
-(8, 8, 1);
+(1, 1, 1);
 
 --
 -- Index pour les tables déchargées
@@ -318,31 +260,31 @@ ALTER TABLE `vote`
 -- AUTO_INCREMENT pour la table `commentaire`
 --
 ALTER TABLE `commentaire`
-  MODIFY `id_commentaire` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_commentaire` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id_message` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_message` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id_notif` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_notif` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `post`
 --
 ALTER TABLE `post`
-  MODIFY `id_post` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_post` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Contraintes pour les tables déchargées

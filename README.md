@@ -41,13 +41,14 @@ GameHub utilise une architecture **MVC (Model-View-Controller)** avec PHP et MyS
 
 1. **Cloner le projet**
 ```bash
-git clone https://iut-git.unice.fr/sae_s301/sae_s301_projet_gamehub.git
+git clone https://github.com/Yukina-Shiro/projet_gamehub
 cd sae_s301_projet_gamehub/src
 ```
 
 2. **Configurer la base de données**
    - Modifiez [config/db.php](src/config/db.php) avec vos identifiants MySQL
-   - Créez la base de données `gj402456_game_hub`
+   - Créez la base de données `gamehub_db`
+   - Il suffit d'importer le fichier `database.sql` dans phpMyAdmin
 
 3. **Créer le dossier uploads**
 ```bash
@@ -70,7 +71,7 @@ Afin de faciliter les tests et la démonstration de l'application, des utilisate
 - **Rôle** : Administrateur (accès au panneau d'administration)
 
 #### Compte Utilisateur (Lambda)
-- **Email** : Bapteve0524@gmail.com
+- **Email** : gamer06@test.com
 - **Mot de passe** : 1234
 - **Rôle** : Utilisateur standard
 
@@ -142,7 +143,6 @@ Afin de faciliter les tests et la démonstration de l'application, des utilisate
 - **Bannissement** : Bannir un utilisateur pour violation des règles
 - **Débannissement** : Restaurer l'accès à un utilisateur banni
 - **Statut utilisateur** : Consulter les utilisateurs actifs, bannissements en cours, etc.
-- **Logs d'administration** : Historique des actions administratives
 
 ---
 
@@ -202,7 +202,7 @@ Afin de faciliter les tests et la démonstration de l'application, des utilisate
 
 ### Modifier votre profil
 
-1. Accédez à votre profil (🧑 Profil en bas)
+1. Accédez à votre profil
 2. Cliquez sur **Modifier mon profil**
 3. Mettez à jour vos informations
 4. Sauvegardez
@@ -226,45 +226,15 @@ Afin de faciliter les tests et la démonstration de l'application, des utilisate
    - 🔴 **Banni** : Compte suspendu
    - ⏱️ **Bannissement temporaire** : Compte banni jusqu'à une date spécifique
 
-### Bannir un utilisateur
+### Supprimer un utilisateur :
+
+ - L'administrateur peut supprimer définitivement un compte ne respectant pas les règles, ce qui supprimera également tous ses posts et commentaires.
 
 **Raisons courantes :**
 - Contenu inapproprié
 - Harcèlement
 - Spam
 - Violation des conditions d'utilisation
-
-**Procédure :**
-
-1. Accédez à la fiche utilisateur
-2. Cliquez sur **Bannir cet utilisateur**
-3. Choisissez le type de bannissement :
-   - **Bannissement permanent** : L'utilisateur ne peut plus accéder
-   - **Bannissement temporaire** : Jusqu'à une date spécifique
-4. Saisissez une raison (visible dans les logs)
-5. Validez
-
-**Effet immédiat :**
-- L'utilisateur est déconnecté
-- Ses posts sont masqués
-- Il ne peut plus se connecter
-- Il reçoit une notification de bannissement
-
-### Débannir un utilisateur
-
-1. Accédez à la fiche utilisateur banni
-2. Cliquez sur **Débannir cet utilisateur**
-3. Confirmez l'action
-4. L'utilisateur peut à nouveau accéder
-
-### Consulter les logs d'administration
-
-1. Dans le panneau d'administration, allez dans **Logs**
-2. Vous voyez l'historique complet des actions administratives :
-   - Bannissements
-   - Débannissements
-   - Suppressions de contenu
-   - Modifications de rôles
 
 ### Modifier les rôles utilisateurs
 
@@ -304,9 +274,7 @@ sae_s301_projet_gamehub/
 │   │   ├── FriendModel.php       # Gestion amitié
 │   │   ├── FollowModel.php       # Gestion abonnements
 │   │   ├── ChatModel.php         # Gestion messages
-│   │   ├── NotificationModel.php # Gestion notifications
-│   │   ├── AdminModel.php        # Gestion administration
-│   │   └── BanModel.php          # Gestion bannissements
+│   │   └── NotificationModel.php # Gestion notifications
 │   ├── views/
 │   │   ├── auth/
 │   │   │   ├── login.php         # Connexion
@@ -318,9 +286,7 @@ sae_s301_projet_gamehub/
 │   │   │   └── settings.php      # Paramètres
 │   │   ├── admin/
 │   │   │   ├── dashboard.php     # Tableau de bord
-│   │   │   ├── users.php         # Gestion utilisateurs
-│   │   │   ├── bans.php          # Gestion bannissements
-│   │   │   └── logs.php          # Logs administratifs
+│   │   │   └── users.php         # Gestion utilisateurs
 │   │   ├── chat/
 │   │   │   ├── index.php         # Liste conversations
 │   │   │   └── conversation.php  # Conversation
@@ -334,7 +300,7 @@ sae_s301_projet_gamehub/
 │   │   ├── post_edit.php         # Éditer post
 │   │   └── faq.php               # FAQ
 │   └── uploads/                  # Photos de profil & posts
-└── README.md                      # Cette documentation
+└── README.md                     # Cette documentation
 ```
 
 ---
@@ -355,27 +321,6 @@ sae_s301_projet_gamehub/
 - statut (actif, banni)
 - date_ban (nullable)
 - raison_ban (nullable)
-```
-
-### Ban (Bannissement)
-```
-- id_ban (PK)
-- id_utilisateur (FK)
-- id_admin (FK)
-- raison
-- date_ban
-- date_fin_ban (NULL = permanent)
-- actif (0/1)
-```
-
-### Log Admin
-```
-- id_log (PK)
-- id_admin (FK)
-- action (ban, unban, delete_post, etc.)
-- cible_id (FK vers utilisateur/post)
-- raison
-- date_action
 ```
 
 ### Post
@@ -449,7 +394,6 @@ sae_s301_projet_gamehub/
 - **XSS** : Utilisation de `htmlspecialchars()` et `nl2br()`
 - **Vérification d'accès** : Contrôle dans les controllers
 - **Vérification de rôle** : Seuls les admins accèdent au panneau d'administration
-- **Audit** : Tous les logs administratifs sont enregistrés
 
 ---
 
@@ -461,9 +405,19 @@ sae_s301_projet_gamehub/
 - [ ] Notifications en temps réel (WebSocket)
 - [ ] Upload de vidéos
 - [ ] Badges et achievements
-- [ ] Systèmes de clans/équipes
+- [ ] Systèmes de groupes
 - [ ] Classement global
 - [ ] 2FA (Authentification à deux facteurs)
+
+---
+
+## 📸 Aperçu de l'application
+
+![Fil d'actualité](./screen/gamehub_home_page.png)
+*Le fil d'actualité personnalisé.*
+
+![Profil Utilisateur](./screen/gamehub_profile_page.png)
+*Le profil avec le système d'abonnement et d'amis.*
 
 ---
 
@@ -487,6 +441,7 @@ Ce projet est un projet scolaire (SAE S301). Tous droits réservés.
 
 ## 📞 Support
 
-Pour toute question, consultez la **FAQ** intégrée à l'application ou contactez l'équipe de développement.
+Créé par Enora Saunier - [Lien vers mon Portfolio.](https://portfolio-enora-saunier.vercel.app/)
+
 
 **Happy Gaming! 🎮**
